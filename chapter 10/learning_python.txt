@@ -1,0 +1,4 @@
+In Python you can read txt files
+In Python you can do this using Path
+In Python you can not use path unless you import it first
+In Python you can code(I think thats pretty obvious)
