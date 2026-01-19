@@ -12,9 +12,10 @@ class AlienInvasion:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
-        
-        self.screen = pygame.display.set_mode(
-            (self.settings.screen_width, self.settings.screen_height))
+
+        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        self.settings.screen_width = self.screen.get_rect().width
+        self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Alien Invasion")
 
         self.ship = Ship(self)  
@@ -43,6 +44,8 @@ class AlienInvasion:
             self.ship.moving_right = True
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = True
+        elif event.key == pygame.K_q:
+            sys.exit()    
 
     def _check_keyup_events(self, event):
         if event.key == pygame.K_RIGHT:
@@ -54,7 +57,6 @@ class AlienInvasion:
          """Update imiges and flip the screen"""
          self.screen.fill(self.settings.bg_color)
          self.ship.blitme()
-
          pygame.display.flip()
 
 if __name__ == '__main__':
