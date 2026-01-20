@@ -8,7 +8,7 @@ from ship import Ship
 class AlienInvasion:
     """overall class to manage game assets and behavior"""
     def __init__(self):
-        """Initalize the game, and create the game res"""
+        """Initalize the game, and create the game resources"""
         pygame.init()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
