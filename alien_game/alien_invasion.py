@@ -32,6 +32,7 @@ class AlienInvasion:
             self._check_events()
             self.ship.update()
             self._update_bullets()
+            self._update_aliens()
             self._update_screen()
             self.clock.tick(60)
 
@@ -77,12 +78,34 @@ class AlienInvasion:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
+    
+    def _update_aliens(self):
+        """update the positions off all aliens"""
+        self.aliens.update()
 
     def _create_fleet(self):
         """Create the fleet of aliens"""
-        # Make an alien
+        # Make an alien and create aliens until no room 
+        # space betweeen aliens is one alian width and one aliah hight
         alien = Alien(self)
-        self.aliens.add(alien)
+        alien_width, alien_hight = alien.rect.size
+
+        current_x, current_y = alien_width, alien_hight
+        while current_y < (self.settings.screen_height - 3 * alien_hight):
+            while current_x < (self.settings.screen_width):
+                self._create_alien(current_x, current_y)
+                current_x += 2 * alien_width
+            # finished a row; reset the x value, and incrament y value
+            current_x = alien_width
+            current_y += 2 * alien_hight
+
+    def _create_alien(self, x_position, y_position):
+        """create an alian and put it in a fleet"""
+        new_alien = Alien(self)
+        new_alien.x = x_position
+        new_alien.rect.x = x_position
+        new_alien.rect.y = y_position
+        self.aliens.add(new_alien)
 
     def _update_screen(self):
          """Update imiges and flip the screen"""
