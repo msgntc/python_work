@@ -20,8 +20,13 @@ class Alien(Sprite):
         
         # Store the alians horasontal position
         self.x = float(self.rect.x)
+
+    def check_edges(self):
+        """retern true if alien isat the edge of the screen"""
+        screen_rect = self.screen.get_rect()
+        return(self.rect.right >= screen_rect.right) or (self.rect.left <= 0)    
     
     def update(self):
-        """move alein to the right"""
-        self.x += self.settings.alien_speed
+        """move alein to the right or left"""
+        self.x += self.settings.alien_speed * self.settings.fleet_direction
         self.rect.x = self.x

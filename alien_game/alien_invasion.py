@@ -1,8 +1,10 @@
 import sys
+from time import sleep
 
 import pygame
 
 from settings import Settings
+from game_stats import GameStats
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -18,7 +20,10 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
-        pygame.display.set_caption("Alien Invasion")
+        pygame.display.set_caption("Alien Invasion by: Thqt0ne6nh")
+
+        # Create an instance to store game_stats
+        self.stats = GameStats(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group() 
@@ -78,10 +83,27 @@ class AlienInvasion:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
+        self._check_bullet_alien_collisions()
+
+    def _check_bullet_alien_collisions(self):
+        """respont to bullet alien colisions""" 
+        # check for bullets hitting aliens if true get rid of the bullet and allien
+        collisions = pygame.sprite.groupcollide(
+            self.bullets, self.aliens, True, True)
+        if not self.aliens:
+            #destroy existing bullets and create new fleet
+            self.bullets.empty()
+            self._create_fleet()
     
     def _update_aliens(self):
-        """update the positions off all aliens"""
+        """ check if the fleet is at the edge then update the positions off all aliens"""
+        self._check_fleet_edges()
         self.aliens.update()
+
+        # look for alien-ship colisions.
+
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            self._ship_hit()
 
     def _create_fleet(self):
         """Create the fleet of aliens"""
@@ -107,6 +129,19 @@ class AlienInvasion:
         new_alien.rect.y = y_position
         self.aliens.add(new_alien)
 
+    def _check_fleet_edges(self):
+        """respond apropetly if a alien reches an egde"""
+        for alein in self.aliens.sprites():
+            if alein.check_edges():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """drop the entier fleet and change the fleet dirction"""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1                
+
     def _update_screen(self):
          """Update imiges and flip the screen"""
          self.screen.fill(self.settings.bg_color)
@@ -116,6 +151,22 @@ class AlienInvasion:
          self.aliens.draw(self.screen)
 
          pygame.display.flip()
+
+    def _ship_hit(self):
+        """respond to the ship being hit by and alien"""
+        #decrment the aount of ships
+        self.stats.ships_left -= 1.    
+ 
+            # get rid of bullets and aliens
+        self.bullets.empty()
+        self.aliens.empty()
+
+        #create a new fleet and center the ship
+        self._create_fleet
+        self.ship.center_ship()
+
+        # Pause
+        sleep(0.5)
 
 if __name__ == '__main__':
     # Make a game istance, and run the game.
