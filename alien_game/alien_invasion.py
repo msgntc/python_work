@@ -32,13 +32,18 @@ class AlienInvasion:
 
         self._create_fleet() 
 
+        # start alien invasion in an active state.
+        self.game_active = True
+
     def run_game(self):
         """start the main loop for the game"""
         while True:
             self._check_events()
-            self.ship.update()
-            self._update_bullets()
-            self._update_aliens()
+            if self.game_active:
+
+                self.ship.update()
+                self._update_bullets()
+                self._update_aliens()
             self._update_screen()
             self.clock.tick(60)
 
@@ -106,6 +111,9 @@ class AlienInvasion:
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             self._ship_hit()
 
+        # look for aliens hitting the bottom of the screen
+        self._check__aliens_bottom()
+
     def _create_fleet(self):
         """Create the fleet of aliens"""
         # Make an alien and create aliens until no room 
@@ -137,6 +145,14 @@ class AlienInvasion:
                 self._change_fleet_direction()
                 break
 
+    def _check__aliens_bottom(self):
+        """check if any aliens have reached the bottom of the screen"""
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= self.settings.screen_height:
+                # the same as if the ship gets hit
+                self._ship_hit()
+                break      
+
     def _change_fleet_direction(self):
         """drop the entier fleet and change the fleet dirction"""
         for alien in self.aliens.sprites():
@@ -155,19 +171,22 @@ class AlienInvasion:
 
     def _ship_hit(self):
         """respond to the ship being hit by and alien"""
-        #decrment the aount of ships
-        self.stats.ships_left -= 1.    
+        if self.stats.ships_left > 0:
+           #decrment the aount of ships
+           self.stats.ships_left -= 1.    
  
-            # get rid of bullets and aliens
-        self.bullets.empty()
-        self.aliens.empty()
+           # get rid of bullets and aliens
+           self.bullets.empty()
+           self.aliens.empty()
 
-        #create a new fleet and center the ship
-        self._create_fleet
-        self.ship.center_ship()
+           #create a new fleet and center the ship
+           self._create_fleet
+           self.ship.center_ship()
 
-        # Pause
-        sleep(0.5)
+           # Pause
+           sleep(0.5)
+        else:
+            self.game_active = False 
 
 if __name__ == '__main__':
     # Make a game istance, and run the game.
