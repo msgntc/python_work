@@ -114,7 +114,7 @@ class AlienInvasion:
 
         current_x, current_y = alien_width, alien_hight
         while current_y < (self.settings.screen_height - 3 * alien_hight):
-            while current_x < (self.settings.screen_width):
+            while current_x < (self.settings.screen_width - 2 * alien_width):     
                 self._create_alien(current_x, current_y)
                 current_x += 2 * alien_width
             # finished a row; reset the x value, and incrament y value
