@@ -8,6 +8,7 @@ from game_stats import GameStats
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from song import play_music
 
 class AlienInvasion:
     """overall class to manage game assets and behavior"""
@@ -21,7 +22,6 @@ class AlienInvasion:
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Alien Invasion by: Thqt0ne6nh")
-        
 
         # Create an instance to store game_stats
         self.stats = GameStats(self)
@@ -46,6 +46,10 @@ class AlienInvasion:
                 self._update_aliens()
             self._update_screen()
             self.clock.tick(60)
+
+    def _play_song(self):
+        """play a song"""
+        play_music("song/song.mp3")        
 
     def _check_events(self):
             """respond to key"""
