@@ -40,7 +40,6 @@ class AlienInvasion:
 
     def run_game(self):
         """start the main loop for the game"""
-        self._play_song()
         while True:
             self._check_events()
             if self.game_active:
@@ -48,13 +47,7 @@ class AlienInvasion:
                 self._update_bullets()
                 self._update_aliens()
             self._update_screen()
-            self.clock.tick(60)
-
-    def _play_song(self):
-        """play a song"""
-        #play_music("song/song.mp3")
-        pygame.mixer.music.load("song/song.mp3")
-        pygame.mixer.music.play(-1)       
+            self.clock.tick(60)      
 
     def _check_events(self):
             """respond to key"""
@@ -70,9 +63,27 @@ class AlienInvasion:
                     self._check_play_button(mouse_pos)
 
     def _check_play_button(self, mouse_pos):
-        """start a new game when the player clicks play""" 
-        if self.play_button.rect.collidepoint(mouse_pos):
-            self.game_active = True                  
+        """start a new game when the player clicks play"""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos) 
+        if button_clicked and not self.game_active:
+            # Reset the game satistics
+            self.stats.reset_stats()
+            self.game_active = True 
+
+            # Get rid of any remaining bullets and aliens. 
+            self.bullets.empty()
+            self.aliens.empty()
+
+            # create a new fleet and centure the ship
+            self._create_fleet()
+            self.ship.center_ship()
+
+            # play a song 
+            pygame.mixer.music.load("song/song.mp3")
+            pygame.mixer.music.play(-1)   
+
+            # Hide the mouse curser
+            pygame.mouse.set_visible(False)                    
 
     def _check_keydown_events(self, event):
         """respond to keypresses"""            
@@ -208,6 +219,7 @@ class AlienInvasion:
            sleep(0.5)
         else:
             self.game_active = False 
+            pygame.mouse.set_visible(True)
 
 if __name__ == '__main__':
     # Make a game istance, and run the game.
