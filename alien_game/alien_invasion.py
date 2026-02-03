@@ -5,6 +5,7 @@ import pygame
 
 from settings import Settings
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from button import Button
 from ship import Ship
 from bullet import Bullet
@@ -21,10 +22,12 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
-        pygame.display.set_caption("Alien Invasion by: Thqt0ne6nh")
+        pygame.display.set_caption("Alien Invasion by: Thqt0ne6uy")
 
         # Create an instance to store game_stats
+        # and create a scoreboard
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group() 
@@ -66,8 +69,11 @@ class AlienInvasion:
         """start a new game when the player clicks play"""
         button_clicked = self.play_button.rect.collidepoint(mouse_pos) 
         if button_clicked and not self.game_active:
+            # Reset the game speed
+            self.settings.initialize_dynamic_settings()
             # Reset the game satistics
             self.stats.reset_stats()
+            self.sb.prep_score()
             self.game_active = True 
 
             # Get rid of any remaining bullets and aliens. 
@@ -78,12 +84,19 @@ class AlienInvasion:
             self._create_fleet()
             self.ship.center_ship()
 
-            # play a song 
-            pygame.mixer.music.load("song/song.mp3")
-            pygame.mixer.music.play(-1)   
+            # Hide the mouse curser
+            pygame.mouse.set_visible(False)
+
+            # play a song
+            if self.game_active == True:
+                pygame.mixer.music.load("song/song.mp3")
+                pygame.mixer.music.play(-1)
 
             # Hide the mouse curser
-            pygame.mouse.set_visible(False)                    
+            pygame.mouse.set_visible(False)
+             
+            # Hide the mouse curser
+            pygame.mouse.set_visible(False)                   
 
     def _check_keydown_events(self, event):
         """respond to keypresses"""            
@@ -124,10 +137,15 @@ class AlienInvasion:
         # check for bullets hitting aliens if true get rid of the bullet and allien
         collisions = pygame.sprite.groupcollide(
             self.bullets, self.aliens, True, True)
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens) 
+            self.sb.prep_score()
         if not self.aliens:
             #destroy existing bullets and create new fleet
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
     
     def _update_aliens(self):
         """ check if the fleet is at the edge then update the positions off all aliens"""
@@ -194,6 +212,9 @@ class AlienInvasion:
              bullet.draw_bullet()
          self.ship.blitme()
          self.aliens.draw(self.screen)
+
+         # draw the score information
+         self.sb.show_score()
 
          # Draw the play button if the game is inactive.
          if not self.game_active:

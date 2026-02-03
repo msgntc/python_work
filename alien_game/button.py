@@ -9,7 +9,7 @@ class Button:
 
         # set the dimentions of the button
         self.width, self.hight = 200, 50
-        self.button_color = (0, 135, 0)
+        self.button_color = (60, 135, 85)
         self.text_color = (255, 255, 255)
         self.font = pygame.font.SysFont(None, 48)
 
@@ -30,4 +30,4 @@ class Button:
     def draw_butten(self):
         """braw blank butten and a message"""
         self.screen.fill(self.button_color, self.rect)
-        self.screen.blit(self.msg_image, self.msg_image_rect)    
+        self.screen.blit(self.msg_image, self.msg_image_rect)
