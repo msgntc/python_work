@@ -40,8 +40,10 @@ class AlienInvasion:
 
         # Make the Play button
         self.buttons = [
-        Button(self, "story", "Story Mode", 500, 413, 200, 50),
+        Button(self, "story", "Story Mode", 350, 413, 200, 50),
         Button(self, "free play", "Free Play", 800, 413, 200, 50),
+        Button(self, "time", "A five minute experience", 800, 500, 200, 0),
+        Button(self, "S_time", "A ____ minute experience", 350, 500, 200, 0)
         ]
 
     def run_game(self):
