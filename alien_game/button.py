@@ -3,11 +3,13 @@ import pygame.font
 class Button:
     """A class to build buttons for the game."""
 
-    def __init__(self, ai_game, name, msg, x, y, width=200, height=50):
+    def __init__(self, ai_game, name, msg, x, y, width, height):
         self.screen = ai_game.screen
 
         # identity
-        self.name = name 
+        self.name = name
+        self.width = width
+        self.height = height
 
         # visuals
         self.width, self.height = width, height

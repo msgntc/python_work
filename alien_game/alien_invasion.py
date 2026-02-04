@@ -40,8 +40,8 @@ class AlienInvasion:
 
         # Make the Play button
         self.buttons = [
-        Button(self, "story", "Story Mode", 500, 413),
-        Button(self, "options", "Free Play", 800, 413),
+        Button(self, "story", "Story Mode", 500, 413, 200, 50),
+        Button(self, "free play", "Free Play", 800, 413, 200, 50),
         ]
 
     def run_game(self):
@@ -70,7 +70,9 @@ class AlienInvasion:
 
     def _check_play_button(self, mouse_pos):
         """start a new game when the player clicks play"""
-        button_clicked = self.free_play_button.rect.collidepoint(mouse_pos) 
+        for butten in self.buttons:
+            if butten.name == "free play":
+                button_clicked = butten.rect.collidepoint(mouse_pos) 
         if button_clicked and not self.game_active:
             # Reset the game speed
             self.settings.initialize_dynamic_settings()
