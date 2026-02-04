@@ -6,7 +6,8 @@ import pygame
 from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
-from button import Button
+from free_play_button import Free_play_button
+from story_button import Story_button
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -39,7 +40,8 @@ class AlienInvasion:
         self.game_active = False
 
         # Make the Play button
-        self.play_button = Button(self, "Play")
+        self.free_play_button = Free_play_button(self, "Free Play")
+        self.story_butten = Story_button(self, "Story Mode")
 
     def run_game(self):
         """start the main loop for the game"""
@@ -67,7 +69,7 @@ class AlienInvasion:
 
     def _check_play_button(self, mouse_pos):
         """start a new game when the player clicks play"""
-        button_clicked = self.play_button.rect.collidepoint(mouse_pos) 
+        button_clicked = self.free_play_button.rect.collidepoint(mouse_pos) 
         if button_clicked and not self.game_active:
             # Reset the game speed
             self.settings.initialize_dynamic_settings()
@@ -225,7 +227,8 @@ class AlienInvasion:
 
          # Draw the play button if the game is inactive.
          if not self.game_active:
-             self.play_button.draw_butten()
+             self.free_play_button.draw_butten()
+             self.story_butten.draw_butten()
 
          pygame.display.flip()
 
