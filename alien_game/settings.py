@@ -22,7 +22,7 @@ class Settings:
         # how the game speed up
         self.speedup_scale = 1.3
         # how quckly the alian piont value increase
-        self.score_scale = 1.5
+        self.score_scale = 1.7
 
         self.initialize_dynamic_settings()
 
