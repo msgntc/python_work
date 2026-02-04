@@ -6,7 +6,6 @@ from ship import Ship
 class Scoreboard:
     """A class to report scoring information"""
 
-
     def __init__(self, ai_game):
         """initalize scorekeeping atrabutes"""
         self.ai_game = ai_game
