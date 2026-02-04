@@ -52,6 +52,7 @@ class Scoreboard:
         """Check to see if theres a new high score"""
         if self.stats.score > self.stats.high_score:
             self.stats.high_score = self.stats.score
+            self.stats.save_high_score()
             self.prep_high_score()
 
     def show_score(self):

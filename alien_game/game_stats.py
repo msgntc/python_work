@@ -12,7 +12,7 @@ class GameStats:
             high_score = self.path.read_text() 
             value = json.loads(high_score)
             self.high_score = value
-        except FileNotFoundError:
+        except:
             self.high_score = 0
                         
     def reset_stats(self):
