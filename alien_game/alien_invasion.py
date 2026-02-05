@@ -36,6 +36,7 @@ class AlienInvasion:
         self._create_fleet() 
 
         # start alien invasion in an active state.
+        self.game_mode = "MENU"
         self.game_active = False
 
         # Make the Play button
@@ -50,12 +51,15 @@ class AlienInvasion:
         """start the main loop for the game"""
         while True:
             self._check_events()
-            if self.game_active:
+            if self.game_mode == "FREE":
                 self.ship.update()
                 self._update_bullets()
                 self._update_aliens()
+            elif self.game_mode == "STORY":
+                pass
+                # will add game logic later
             self._update_screen()
-            self.clock.tick(60)      
+            self.clock.tick(60)  
 
     def _check_events(self):
             """respond to key"""
@@ -68,45 +72,89 @@ class AlienInvasion:
                      self._check_keyup_events(event)  
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
-                    self._check_play_button(mouse_pos)
+                    self._check_button_pressed(mouse_pos)
 
-    def _check_play_button(self, mouse_pos):
+    def _check_button_pressed(self, mouse_pos):
         """start a new game when the player clicks play"""
+        button_clicked = False
+        butten_selected = None
+
+        # Only allow button clicks from the menu
+        if self.game_mode != "MENU":
+            return
+
         for butten in self.buttons:
             if butten.name == "free play":
-                button_clicked = butten.rect.collidepoint(mouse_pos) 
-        if button_clicked and not self.game_active:
-            # Reset the game speed
-            self.settings.initialize_dynamic_settings()
-            # Reset the game satistics
-            self.stats.reset_stats()
-            self.sb.prep_score()
-            self.sb.prep_level()
-            self.sb.prep_ships()
-            self.game_active = True 
+                if butten.rect.collidepoint(mouse_pos):
+                    button_clicked = True
+                    butten_selected = "FREE"
+                    break
 
-            # Get rid of any remaining bullets and aliens. 
-            self.bullets.empty()
-            self.aliens.empty()
+            elif butten.name == "story":
+                if butten.rect.collidepoint(mouse_pos):
+                    button_clicked = True
+                    butten_selected = "STORY"
+                    break
 
-            # create a new fleet and centure the ship
-            self._create_fleet()
-            self.ship.center_ship()
+        if button_clicked:
+            if butten_selected == "FREE":
+                self._start_free_play()
+            elif butten_selected == "STORY":
+                self._start_story_mode()
 
-            # Hide the mouse curser
-            pygame.mouse.set_visible(False)
+    def _start_free_play(self):
+        """start free play"""  
+        self.settings.initialize_dynamic_settings()
+        # Reset the game satistics
+        self.stats.reset_stats()
+        self.sb.prep_score()
+        self.sb.prep_level()
+        self.sb.prep_ships()
+        self.game_mode = "FREE" 
+
+        # Get rid of any remaining bullets and aliens. 
+        self.bullets.empty()
+        self.aliens.empty()
+
+        # create a new fleet and centure the ship
+        self._create_fleet()
+        self.ship.center_ship()
+
+        # Hide the mouse curser
+        pygame.mouse.set_visible(False)
 
             # play a song
-            if self.game_active == True:
+        if self.game_mode == "FREE":
                 pygame.mixer.music.load("song/song.mp3")
                 pygame.mixer.music.play(-1)
 
-            # Hide the mouse curser
-            pygame.mouse.set_visible(False)
-             
-            # Hide the mouse curser
-            pygame.mouse.set_visible(False)                   
+    def _start_story_mode(self):
+        """start your grand adventure (smilly face emoji)"""
+        self.settings.initialize_dynamic_settings()
+        # Reset the game satistics
+        self.stats.reset_stats()
+        self.sb.prep_score()
+        self.sb.prep_level()
+        self.sb.prep_ships()
+        self.game_mode = "STORY" 
 
+        # Get rid of any remaining bullets and aliens. 
+        self.bullets.empty()
+        self.aliens.empty()
+
+        # create a new fleet and centure the ship
+        self.ship.center_ship()
+
+        # Hide the mouse curser
+        pygame.mouse.set_visible(False)
+
+            # play a song
+        if self.game_mode == "FREE":
+                pygame.mixer.music.load("song/song.mp3")
+                pygame.mixer.music.play(-1)
+
+
+        
     def _check_keydown_events(self, event):
         """respond to keypresses"""            
         if event.key == pygame.K_RIGHT:
@@ -115,7 +163,7 @@ class AlienInvasion:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
             sys.exit()  
-        elif event.key == pygame.K_SPACE:
+        elif event.key == pygame.K_SPACE or pygame.K_UP:
             self._fire_bullet()      
 
     def _check_keyup_events(self, event):
@@ -231,7 +279,7 @@ class AlienInvasion:
          self.sb.show_score()
 
          # Draw the play button if the game is inactive.
-         if not self.game_active:
+         if self.game_mode == "MENU":
              for button in self.buttons:
                  button.draw_button()
 
@@ -241,7 +289,7 @@ class AlienInvasion:
         """respond to the ship being hit by and alien"""
         if self.stats.ships_left > 0:
            # Decrement ships_left, and update scorebord
-           self.stats.ships_left -= 1.
+           self.stats.ships_left -= 1
            self.sb.prep_ships()  
  
            # get rid of bullets and aliens
@@ -249,14 +297,15 @@ class AlienInvasion:
            self.aliens.empty()
 
            #create a new fleet and center the ship
-           self._create_fleet
+           self._create_fleet()
            self.ship.center_ship()
 
            # Pause
            sleep(0.5)
         else:
-            self.game_active = False 
+            self.game_mode = "MENU"
             pygame.mouse.set_visible(True)
+            pygame.mixer.music.stop()
 
 if __name__ == '__main__':
     # Make a game istance, and run the game.
