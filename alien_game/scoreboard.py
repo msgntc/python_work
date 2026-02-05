@@ -28,9 +28,14 @@ class Scoreboard:
         """turn the score into a rendered image"""
         rounded_score = round(self.stats.score, 0)
         score_str = f"{rounded_score:,}"
-        self.score_image = self.font.render(score_str, True,
-                self.text_color, self.settings.bg_color)
-        
+
+        if getattr(self.ai_game, "game_mode", "FREE") == "STORY":
+            self.score_image = self.font.render(score_str, True, self.settings.bg_color)
+        else:
+            self.score_image = self.font.render(
+                score_str, True, self.text_color, self.settings.bg_color
+            )
+
         # display the score at the top right of the screen
         self.score_rect = self.score_image.get_rect()
         self.score_rect.right = self.screen_rect.right - 20
@@ -40,13 +45,19 @@ class Scoreboard:
         """turn the high score into a rendered image"""
         high_score = round(self.stats.high_score, 0)
         high_score_str = f"{high_score:,}"
-        self.high_score_image = self.font.render(high_score_str, True,
-                self.text_color, self.settings.bg_color)
+
+        # STORY: no background rect. FREE (and others): keep background rect.
+        if getattr(self.ai_game, "game_mode", "FREE") == "STORY":
+            self.high_score_image = self.font.render(high_score_str, True, self.settings.bg_color)
+        else:
+            self.high_score_image = self.font.render(
+                high_score_str, True, self.text_color, self.settings.bg_color
+            )
 
         # center the high score at the top of the screen
         self.high_score_rect = self.high_score_image.get_rect()
         self.high_score_rect.centerx = self.screen_rect.centerx
-        self.high_score_rect.top = self.score_rect.top    
+        self.high_score_rect.top = self.score_rect.top   
 
     def check_high_score(self):
         """Check to see if theres a new high score"""
@@ -60,14 +71,20 @@ class Scoreboard:
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
-        self.ships.draw(self.screen)
+        if getattr(self.ai_game, "game_mode", "FREE") != "STORY":
+            self.ships.draw(self.screen)
 
     def prep_level(self):
         """turn the level into a rendered image"""
         level_str = str(self.stats.level)
-        self.level_image = self.font.render(level_str, True,
-                self.text_color, self.settings.bg_color)
-        
+
+        if getattr(self.ai_game, "game_mode", "FREE") == "STORY":
+            self.level_image = self.font.render(level_str, True, self.settings.bg_color)
+        else:
+            self.level_image = self.font.render(
+                level_str, True, self.text_color, self.settings.bg_color
+            )
+
         # position the level below the score
         self.level_rect = self.level_image.get_rect()
         self.level_rect.right = self.score_rect.right

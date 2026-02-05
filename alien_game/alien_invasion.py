@@ -26,6 +26,9 @@ class AlienInvasion:
 
         # Create an instance to store game_stats
         # and create a scoreboard
+
+        # start alien invasion in an inactive state.
+        self.game_mode = "MENU"
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
 
@@ -33,18 +36,23 @@ class AlienInvasion:
         self.bullets = pygame.sprite.Group() 
         self.aliens = pygame.sprite.Group()
 
+        # --- Story dialogue system ---
+        self.dialogue_active = False
+        self.dialogue_lines = []
+        self.dialogue_index = 0
+        self.dialogue_font = pygame.font.SysFont(None, 48)
+
         self._create_fleet() 
 
         # start alien invasion in an active state.
-        self.game_mode = "MENU"
-        self.game_active = False
+
 
         # Make the Play button
         self.buttons = [
         Button(self, "story", "Story Mode", 350, 413, 200, 50),
         Button(self, "free play", "Free Play", 800, 413, 200, 50),
         Button(self, "time", "A five minute experience", 800, 500, 200, 0),
-        Button(self, "S_time", "A ____ minute experience", 350, 500, 200, 0)
+        Button(self, "S_time", "A ____ minute experience", 350, 500, 200, 0),
         ]
 
     def run_game(self):
@@ -133,10 +141,11 @@ class AlienInvasion:
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
         self.stats.reset_stats()
-        self.sb.prep_score()
-        self.sb.prep_level()
         self.sb.prep_ships()
-        self.game_mode = "STORY" 
+        self.game_mode = "STORY"
+        self.sb.prep_score()
+        self.sb.prep_high_score()
+        self.sb.prep_level()
 
         # Get rid of any remaining bullets and aliens. 
         self.bullets.empty()
@@ -147,14 +156,15 @@ class AlienInvasion:
 
         # Hide the mouse curser
         pygame.mouse.set_visible(False)
-
-            # play a song
-        if self.game_mode == "FREE":
-                pygame.mixer.music.load("song/song.mp3")
-                pygame.mixer.music.play(-1)
-
-
-        
+        self.dialogue_lines = [
+            "Captain… we lost contact with Earth.",
+            "Long-range scanners show hostile ships approaching.",
+            "This is your first mission.",
+            "Press ENTER to begin."
+        ]
+        self.dialogue_index = 0
+        self.dialogue_active = True
+                
     def _check_keydown_events(self, event):
         """respond to keypresses"""            
         if event.key == pygame.K_RIGHT:
@@ -163,7 +173,7 @@ class AlienInvasion:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
             sys.exit()  
-        elif event.key == pygame.K_SPACE or pygame.K_UP:
+        elif event.key == pygame.K_SPACE:
             self._fire_bullet()      
 
     def _check_keyup_events(self, event):
