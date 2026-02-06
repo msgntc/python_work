@@ -7,6 +7,7 @@ from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
 from button import Button
+from story_text import Story_text
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -36,23 +37,18 @@ class AlienInvasion:
         self.bullets = pygame.sprite.Group() 
         self.aliens = pygame.sprite.Group()
 
-        # --- Story dialogue system ---
-        self.dialogue_active = False
-        self.dialogue_lines = []
-        self.dialogue_index = 0
-        self.dialogue_font = pygame.font.SysFont(None, 48)
-
         self._create_fleet() 
-
-        # start alien invasion in an active state.
-
 
         # Make the Play button
         self.buttons = [
         Button(self, "story", "Story Mode", 350, 413, 200, 50),
         Button(self, "free play", "Free Play", 800, 413, 200, 50),
-        Button(self, "time", "A five minute experience", 800, 500, 200, 0),
-        Button(self, "S_time", "A ____ minute experience", 350, 500, 200, 0),
+        Button(self, "time", "A 5 minute experience", 800, 500, 200, 0),
+        Button(self, "S_time", "A 15 minute experience", 350, 500, 200, 0),
+        ]
+
+        self.s_buttens = [
+        Story_text(self, "story", "Story Mode", 350, 413, 200, 50)
         ]
 
     def run_game(self):
@@ -156,15 +152,10 @@ class AlienInvasion:
 
         # Hide the mouse curser
         pygame.mouse.set_visible(False)
-        self.dialogue_lines = [
-            "Captain… we lost contact with Earth.",
-            "Long-range scanners show hostile ships approaching.",
-            "This is your first mission.",
-            "Press ENTER to begin."
-        ]
-        self.dialogue_index = 0
-        self.dialogue_active = True
-                
+
+        for button in self.s_buttens:
+            button.draw_s_button()
+        
     def _check_keydown_events(self, event):
         """respond to keypresses"""            
         if event.key == pygame.K_RIGHT:
