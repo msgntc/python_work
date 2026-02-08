@@ -9,6 +9,8 @@ class Alien(Sprite):
         super().__init__()
         self.screen = ai_game.screen
         self.settings = ai_game.settings
+        self.settings.helth
+        self.helth = self.settings.helth
 
         # Load the alien imadge and set a rect
         self.image = pygame.image.load('images/alien.bmp')
@@ -20,6 +22,9 @@ class Alien(Sprite):
         
         # Store the alians horasontal position
         self.x = float(self.rect.x)
+
+        # alien helth
+        self.settings.helth
 
     def check_edges(self):
         """retern true if alien isat the edge of the screen"""

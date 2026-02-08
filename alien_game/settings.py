@@ -18,6 +18,7 @@ class Settings:
 
         # alien set
         self.fleet_drop_speed = 10
+        self.helth = 100
 
         # how the game speed up
         self.speedup_scale = 1.25

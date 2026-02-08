@@ -60,7 +60,9 @@ class AlienInvasion:
                 self._update_bullets()
                 self._update_aliens()
             elif self.game_mode == "STORY":
-                pass
+                self.ship.update()
+                self._update_bullets()
+                self._update_aliens()
                 # will add game logic later
             self._update_screen()
             self.clock.tick(60)  
@@ -80,6 +82,9 @@ class AlienInvasion:
                         finished = self.dialogue.handle_click(mouse_pos)
                         if finished:
                             pygame.mouse.set_visible(False)
+                            self._create_fleet()
+                            self._update_bullets()
+                            self._update_aliens()
                             continue
                     self._check_button_pressed(mouse_pos)
 
@@ -115,6 +120,7 @@ class AlienInvasion:
         """start free play"""  
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
+        self.settings.helth = 1
         self.stats.reset_stats()
         self.sb.prep_score()
         self.sb.prep_level()
@@ -139,6 +145,7 @@ class AlienInvasion:
 
     def _start_story_mode(self):
         """start your grand adventure (smilly face emoji)"""
+        self.settings.helth = 2
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
         self.stats.reset_stats()
@@ -155,7 +162,6 @@ class AlienInvasion:
         # create a new fleet and centure the ship
         self.ship.center_ship()
 
-        
         lines = [
             "Its been 14 days scence sientist descovered the wormhole",
             "I was sent to gather data when i was attacked",
@@ -208,12 +214,16 @@ class AlienInvasion:
         """respont to bullet alien colisions""" 
         # check for bullets hitting aliens if true get rid of the bullet and allien
         collisions = pygame.sprite.groupcollide(
-            self.bullets, self.aliens, True, True)
+            self.bullets, self.aliens, True, False)
         if collisions:
-            for aliens in collisions.values():
-                self.stats.score += self.settings.alien_points * len(aliens) 
-            self.sb.prep_score()
-            self.sb.check_high_score()
+            for hit_aliens in collisions.values():
+                for alien in hit_aliens:
+                    alien.helth -= 1
+                    if alien.helth <= 0:
+                        self.aliens.remove(alien)
+                        self.stats.score += self.settings.alien_points
+                self.sb.prep_score()
+                self.sb.check_high_score()
         if not self.aliens:
             #destroy existing bullets and create new fleet
             self.bullets.empty()
