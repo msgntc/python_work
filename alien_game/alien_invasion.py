@@ -7,7 +7,7 @@ from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
 from button import Button
-from story_text import Story_text
+from dialouge import Dialogue
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -37,7 +37,11 @@ class AlienInvasion:
         self.bullets = pygame.sprite.Group() 
         self.aliens = pygame.sprite.Group()
 
+        # Story dialogue system 
+        self.dialogue = None
+
         self._create_fleet() 
+
 
         # Make the Play button
         self.buttons = [
@@ -45,10 +49,6 @@ class AlienInvasion:
         Button(self, "free play", "Free Play", 800, 413, 200, 50),
         Button(self, "time", "A 5 minute experience", 800, 500, 200, 0),
         Button(self, "S_time", "A 15 minute experience", 350, 500, 200, 0),
-        ]
-
-        self.s_buttens = [
-        Story_text(self, "story", "Story Mode", 350, 413, 200, 50)
         ]
 
     def run_game(self):
@@ -76,6 +76,11 @@ class AlienInvasion:
                      self._check_keyup_events(event)  
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
+                    if self.game_mode == "STORY" and self.dialogue and self.dialogue.active:
+                        finished = self.dialogue.handle_click(mouse_pos)
+                        if finished:
+                            pygame.mouse.set_visible(False)
+                            continue
                     self._check_button_pressed(mouse_pos)
 
     def _check_button_pressed(self, mouse_pos):
@@ -150,12 +155,21 @@ class AlienInvasion:
         # create a new fleet and centure the ship
         self.ship.center_ship()
 
-        # Hide the mouse curser
-        pygame.mouse.set_visible(False)
-
-        for button in self.s_buttens:
-            button.draw_s_button()
         
+        lines = [
+            "Its been 14 days scence sientist descovered the wormhole",
+            "I was sent to gather data when i was attacked",
+            "the attacker was a ship almost identikle to mine",
+            "I maneged to get the ship to flee but not without setback",
+            "my ship wich usually is much stronger is in a weekend condision",
+            "And i fear that this my be detramental",
+            "my radars have picked up stange energy singnals",
+            "I dant know what it is...",
+            "...but my guess...",
+            "ALIENS"
+        ]
+        self.dialogue = Dialogue(self, lines)
+
     def _check_keydown_events(self, event):
         """respond to keypresses"""            
         if event.key == pygame.K_RIGHT:
@@ -283,6 +297,9 @@ class AlienInvasion:
          if self.game_mode == "MENU":
              for button in self.buttons:
                  button.draw_button()
+
+         if self.game_mode == "STORY" and self.dialogue and self.dialogue.active:
+           self.dialogue.draw()         
 
          pygame.display.flip()
 
