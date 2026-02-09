@@ -56,7 +56,7 @@ class AlienInvasion:
                 self._update_bullets()
                 self._update_aliens()
             elif self.game_mode == "STORY":
-                self.settings.alien_speed = 10
+                self.settings.alien_speed = 6
                 self.settings.ship_speed = 10
                 self.settings.bullet_speed = 20
                 if not self.dialogue.active:
