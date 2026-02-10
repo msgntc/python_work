@@ -58,6 +58,8 @@ class AlienInvasion:
             if self.game_mode == "FREE":
                 self.ship.update()
                 self._update_bullets()
+                self._fire_alien_bullet()
+                self._update_alien_bullets()
                 self._update_aliens()
             elif self.game_mode == "STORY":
                 self.settings.alien_speed = 6
@@ -65,6 +67,8 @@ class AlienInvasion:
                 self.settings.bullet_speed = 20
                 if not self.dialogue.active:
                     self._update_bullets()
+                    self._fire_alien_bullet()
+                    self._update_alien_bullets()
                     self._update_aliens()
                     self.ship.update()
             self._update_screen()
@@ -132,6 +136,7 @@ class AlienInvasion:
 
         # Get rid of any remaining bullets and aliens. 
         self.bullets.empty()
+        self.alien_bullets.empty()
         self.aliens.empty()
 
         # create a new fleet and centure the ship
@@ -160,6 +165,7 @@ class AlienInvasion:
 
         # Get rid of any remaining bullets and aliens. 
         self.bullets.empty()
+        self.alien_bullets.empty()
         self.aliens.empty()
 
         # create a new fleet and centure the ship
@@ -229,13 +235,13 @@ class AlienInvasion:
 
     def _update_alien_bullets(self):
         """move the alien bullets"""
-        self.bullets.update()
+        self.alien_bullets.update()
 
         # Get rid of old bullets
-        for bullet in self.bullets.copy():
-            if bullet.rect.bottom <= 0:
-                self.bullets.remove(bullet)
-        self._check_bullet_alien_collisions()
+        for bullet in self.alien_bullets.copy():
+            if bullet.rect.top >= self.settings.screen_height:
+                self.alien_bullets.remove(bullet)
+        self._check_alien_bulets_ship_colisoins()
 
     def _check_bullet_alien_collisions(self):
         """respont to bullet alien colisions""" 
@@ -263,6 +269,10 @@ class AlienInvasion:
     
     def _check_alien_bulets_ship_colisoins(self):
         """check if an alien bullet hit the ship"""
+        hit_bullet = pygame.sprite.spritecollideany(self.ship, self.alien_bullets)
+        if hit_bullet:
+            self.alien_bullets.remove(hit_bullet)
+            self._ship_hit(hit_bullet)
     
     def _update_aliens(self):
         """ check if the fleet is at the edge then update the positions off all aliens"""
@@ -356,6 +366,7 @@ class AlienInvasion:
  
             # get rid of bullets and aliens
                 self.bullets.empty()
+                self.alien_bullets.empty()
                 self.aliens.empty()
 
            #create a new fleet and center the ship
