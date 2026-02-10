@@ -216,7 +216,6 @@ class AlienInvasion:
 
         self.next_alien_shot_time = this_time + random.randint(500, 1500)
 
-
     def _update_bullets(self): 
         """updates position of bullets and get rid of of old bullets""" 
         # updates position of bullets
@@ -227,7 +226,7 @@ class AlienInvasion:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
         self._check_bullet_alien_collisions()
-    
+
     def _update_alien_bullets(self):
         """move the alien bullets"""
         self.bullets.update()
@@ -237,7 +236,6 @@ class AlienInvasion:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
         self._check_bullet_alien_collisions()
-
 
     def _check_bullet_alien_collisions(self):
         """respont to bullet alien colisions""" 
@@ -262,6 +260,9 @@ class AlienInvasion:
             # increase level
             self.stats.level += 1 
             self.sb.prep_level()
+    
+    def _check_alien_bulets_ship_colisoins(self):
+        """check if an alien bullet hit the ship"""
     
     def _update_aliens(self):
         """ check if the fleet is at the edge then update the positions off all aliens"""
