@@ -11,8 +11,9 @@ from button import Button
 from dialouge import Dialogue
 from ship import Ship
 from bullet import Bullet
-from alien_bullet import AlienBullet
+from aliens_bullets import AlienBullet
 from alien import Alien
+from level_phase import StoryLevel
 
 class AlienInvasion:
     """overall class to manage game assets and behavior"""
@@ -31,6 +32,7 @@ class AlienInvasion:
         self.game_mode = "MENU"
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
+        self.story_level = StoryLevel(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group() 
@@ -64,7 +66,7 @@ class AlienInvasion:
             elif self.game_mode == "STORY":
                 self.settings.alien_speed = 6
                 self.settings.ship_speed = 10
-                self.settings.bullet_speed = 20
+                self.settings.bullet_speed = 10
                 if not self.dialogue.active:
                     self._update_bullets()
                     self._fire_alien_bullet()
@@ -88,10 +90,7 @@ class AlienInvasion:
                     if self.game_mode == "STORY" and self.dialogue and self.dialogue.active:
                         finished = self.dialogue.handle_click(mouse_pos)
                         if finished:
-                            pygame.mouse.set_visible(False)
-                            self.ship.center_ship()
-                            self._create_fleet()
-                            self._fire_alien_bullet()
+                            self.story_level.start_phs_one()
                             continue
                     self._check_button_pressed(mouse_pos)
 
@@ -130,6 +129,7 @@ class AlienInvasion:
         self.settings.helth = 1
         self.stats.reset_stats()
         self.sb.prep_score()
+        self.sb.prep_high_score()
         self.sb.prep_level()
         self.sb.prep_ships()
         self.game_mode = "FREE" 
@@ -323,9 +323,14 @@ class AlienInvasion:
         """check if any aliens have reached the bottom of the screen"""
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= self.settings.screen_height:
-                # the same as if the ship gets hit
-                self._ship_hit()
-                break      
+                if self.game_mode == "FREE":
+                    self._ship_hit()
+                    break    
+                elif self.game_mode == "STORY":
+                    self.game_mode = "MENU"
+                    pygame.mouse.set_visible(True)
+                    pygame.mixer.music.stop()
+                    break  
 
     def _change_fleet_direction(self):
         """drop the entier fleet and change the fleet dirction"""
@@ -356,7 +361,7 @@ class AlienInvasion:
 
          pygame.display.flip()
 
-    def _ship_hit(self, hit_alien):
+    def _ship_hit(self, hit_alien=None):
         """respond to the ship being hit by and alien"""
         if self.stats.ships_left > 0:
            # Decrement ships_left, and update scorebord

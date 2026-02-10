@@ -20,7 +20,10 @@ class Settings:
         self.fleet_drop_speed = 10
         self.helth = 100
         self.alien_bullet_speed = 5
-        self.alien_bullet_color = (0, 0, 0)
+        self.alien_bullet_color = (180, 140, 90)
+        self.phs2_alien = 3
+        self.phs2_alien_speed = 50
+
 
         # how the game speed up
         self.speedup_scale = 1.25
