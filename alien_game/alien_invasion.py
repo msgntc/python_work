@@ -1,4 +1,5 @@
 import sys
+import random
 from time import sleep
 
 import pygame
@@ -10,6 +11,7 @@ from button import Button
 from dialouge import Dialogue
 from ship import Ship
 from bullet import Bullet
+from alien_bullet import AlienBullet
 from alien import Alien
 
 class AlienInvasion:
@@ -32,7 +34,9 @@ class AlienInvasion:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group() 
+        self.alien_bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.next_alien_shot_time = pygame.time.get_ticks()
 
         # Story dialogue system 
         self.dialogue = None
@@ -83,6 +87,7 @@ class AlienInvasion:
                             pygame.mouse.set_visible(False)
                             self.ship.center_ship()
                             self._create_fleet()
+                            self._fire_alien_bullet()
                             continue
                     self._check_button_pressed(mouse_pos)
 
@@ -161,14 +166,14 @@ class AlienInvasion:
         self.ship.center_ship()
 
         lines = [
-            "Its been 14 days scence sientist descovered the wormhole",
-            "I was sent to gather data when i was attacked",
-            "the attacker was a ship almost identikle to mine",
-            "I maneged to get the ship to flee but not without setback",
-            "my ship wich usually is much stronger is in a weekend condision",
-            "And i fear that this my be detramental",
-            "my radars have picked up stange energy singnals",
-            "I dant know what it is...",
+            "It's been 14 days since scientist descovered the wormhole",
+            "I was sent to gather data when I was attacked.",
+            "The attacker was a ship almost identical to mine.",
+            "I managed to get the ship to flee, but not without setbacks.",
+            "My ship, which usually is much stronger, is in a weekend condition",
+            "And I fear that this may be detrimental.",
+            "My radars have picked up strange energy signals.",
+            "I didn't know what it is...",
             "...but my guess...",
             "ALIENS"
         ]
@@ -195,7 +200,22 @@ class AlienInvasion:
         """Create a new bullet an add it to the bullet group"""
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
-            self.bullets.add(new_bullet)  
+            self.bullets.add(new_bullet)
+
+    def _fire_alien_bullet(self):  
+        """have the aliens randomly fire bullets"""
+        if not self.aliens:
+            return
+        this_time = pygame.time.get_ticks()
+        if this_time < self.next_alien_shot_time:
+            return
+
+        alien_shoot = random.choice(self.aliens.sprites())
+        new_bullet = AlienBullet(self, alien_shoot)
+        self.alien_bullets.add(new_bullet)
+
+        self.next_alien_shot_time = this_time + random.randint(500, 1500)
+
 
     def _update_bullets(self): 
         """updates position of bullets and get rid of of old bullets""" 
@@ -207,6 +227,17 @@ class AlienInvasion:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
         self._check_bullet_alien_collisions()
+    
+    def _update_alien_bullets(self):
+        """move the alien bullets"""
+        self.bullets.update()
+
+        # Get rid of old bullets
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+        self._check_bullet_alien_collisions()
+
 
     def _check_bullet_alien_collisions(self):
         """respont to bullet alien colisions""" 
@@ -244,7 +275,7 @@ class AlienInvasion:
             self._ship_hit(hit_alien)
 
         # look for aliens hitting the bottom of the screen
-        self._check__aliens_bottom()
+        self._check_aliens_bottom()
 
     def _create_fleet(self):
         """Create the fleet of aliens"""
@@ -277,7 +308,7 @@ class AlienInvasion:
                 self._change_fleet_direction()
                 break
 
-    def _check__aliens_bottom(self):
+    def _check_aliens_bottom(self):
         """check if any aliens have reached the bottom of the screen"""
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= self.settings.screen_height:
@@ -294,6 +325,8 @@ class AlienInvasion:
     def _update_screen(self):
          """Update imiges and flip the screen"""
          self.screen.fill(self.settings.bg_color)
+         for alien_bullet in self.alien_bullets.sprites():
+             alien_bullet.draw_bullet()
          for bullet in self.bullets.sprites():
              bullet.draw_bullet()
          self.ship.blitme()
