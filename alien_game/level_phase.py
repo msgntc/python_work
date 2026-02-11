@@ -1,6 +1,7 @@
 import pygame
 import random
 from alien import Alien
+from boss import Boss
 
 class StoryLevel:
     """a class for advancing te story phs = phase"""
@@ -9,7 +10,7 @@ class StoryLevel:
         self.ai_game = ai_game
         self.current_phs = 0
         self.phs2_kills = 0
-        self.phase_order = [1, 2, 1, 1, 2, 1, 2, 2]
+        self.phase_order = [1, 2, 3]
         self.phase_index = -1
 
     def start_story(self):
@@ -26,8 +27,10 @@ class StoryLevel:
         next_phase = self.phase_order[self.phase_index]
         if next_phase == 1:
             self.start_phs_one()
-        else:
+        elif next_phase == 2:
             self.start_phs_two()
+        elif next_phase == 3:
+            self._start_boss_phs1()
         return True
 
     def start_phs_one(self):
@@ -76,3 +79,9 @@ class StoryLevel:
             return True
         self._make_phs2_alien()
         return False
+    
+    def _start_boss_phs1(self):
+        """start the first part of the boss"""
+        self.current_phs = 3
+        self.ai_game.aliens.empty()
+        self.ai_game.boss = Boss(self.ai_game)

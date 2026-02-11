@@ -13,6 +13,7 @@ from ship import Ship
 from bullet import Bullet
 from aliens_bullets import AlienBullet
 from alien import Alien
+from boss import Boss
 from level_phase import StoryLevel
 
 class AlienInvasion:
@@ -22,6 +23,7 @@ class AlienInvasion:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
+        self.boss = None
 
         self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         self.settings.screen_width = self.screen.get_rect().width
@@ -129,7 +131,7 @@ class AlienInvasion:
         """start free play"""  
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
-        self.settings.helth = 1
+        self.settings.helth = 2
         self.stats.reset_stats()
         self.sb.prep_score()
         self.sb.prep_high_score()
@@ -253,6 +255,17 @@ class AlienInvasion:
         """respont to bullet alien colisions""" 
         # check for bullets hitting aliens if true get rid of the bullet and allien
         phase_two_done = False
+        boss_hits = []
+        if self.boss is not None:
+            boss_hits = pygame.sprite.spritecollide(
+                self.boss, self.bullets, True)
+        if boss_hits:
+            for _ in boss_hits:
+                boss_dead = self.boss.boss_hit()
+                if boss_dead:
+                    self.boss = None
+                    # will start next phase later
+                    break
         collisions = pygame.sprite.groupcollide(
             self.bullets, self.aliens, True, False)
         if collisions:
@@ -270,6 +283,8 @@ class AlienInvasion:
                     self.sb.prep_score()
                     self.sb.check_high_score()
         if not self.aliens:
+            if self.boss is not None:
+                return
             #destroy existing bullets and create new fleet
             if self.game_mode == "STORY" and self.story_level.current_phs == 2 and not phase_two_done:
                 self.story_level._make_phs2_alien()
@@ -369,6 +384,8 @@ class AlienInvasion:
          self.screen.fill(self.settings.bg_color)
          for alien_bullet in self.alien_bullets.sprites():
              alien_bullet.draw_bullet()
+         if self.boss != None:
+            self.boss.blitme()
          for bullet in self.bullets.sprites():
              bullet.draw_bullet()
          self.ship.blitme()

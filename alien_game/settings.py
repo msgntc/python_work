@@ -24,6 +24,8 @@ class Settings:
         self.phs2_alien = 5
         self.phs2_alien_speed = 25
 
+        # boss settings
+        self.boss_health = 30
 
         # how the game speed up
         self.speedup_scale = 1.25
