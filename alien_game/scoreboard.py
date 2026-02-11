@@ -68,10 +68,14 @@ class Scoreboard:
 
     def show_score(self):
         """draw scores, level and ships to the screen"""
+        story_dialogue_active = (self.ai_game.game_mode == "STORY" and self.ai_game.dialogue
+                                  and self.ai_game.dialogue.active)
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
         if getattr(self.ai_game, "game_mode", "FREE") != "STORY":
+            self.ships.draw(self.screen)
+        elif not story_dialogue_active:
             self.ships.draw(self.screen)
 
     def prep_level(self):
