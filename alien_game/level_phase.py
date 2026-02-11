@@ -9,21 +9,46 @@ class StoryLevel:
         self.ai_game = ai_game
         self.current_phs = 0
         self.phs2_kills = 0
+        self.phase_order = [1, 2, 1, 1, 2, 1, 2, 2]
+        self.phase_index = -1
+
+    def start_story(self):
+        """start the story and load the first phase"""
+        self.phase_index = -1
+        return self.start_next_phase()
+
+    def start_next_phase(self):
+        """advance to the next configured phase"""
+        self.phase_index += 1
+        if self.phase_index >= len(self.phase_order):
+            return False
+
+        next_phase = self.phase_order[self.phase_index]
+        if next_phase == 1:
+            self.start_phs_one()
+        else:
+            self.start_phs_two()
+        return True
 
     def start_phs_one(self):
         """progress the story"""
         self.current_phs = 1
         pygame.mouse.set_visible(False)
+        self.ai_game.bullets.empty()
+        self.ai_game.alien_bullets.empty()
+        self.ai_game.aliens.empty()
         self.ai_game.ship.center_ship()
         self.ai_game._create_fleet()
-        self.ai_game._fire_alien_bullet()
-        pygame.mixer.music.load("song/song.mp3")
-        pygame.mixer.music.play(-1)
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load("song/song.mp3")
+            pygame.mixer.music.play(-1)
 
     def start_phs_two(self):
         """make super fast aliens fall from the top off the screen"""
         self.current_phs = 2
         self.phs2_kills = 0
+        self.ai_game.bullets.empty()
+        self.ai_game.alien_bullets.empty()
         self.ai_game.aliens.empty()
         self.ai_game.settings.alien_speed = self.ai_game.settings.phs2_alien_speed
         self._make_phs2_alien()

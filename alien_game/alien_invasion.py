@@ -93,7 +93,7 @@ class AlienInvasion:
                     if self.game_mode == "STORY" and self.dialogue and self.dialogue.active:
                         finished = self.dialogue.handle_click(mouse_pos)
                         if finished:
-                            self.story_level.start_phs_one()
+                            self.story_level.start_story()
                             continue
                     self._check_button_pressed(mouse_pos)
 
@@ -269,13 +269,14 @@ class AlienInvasion:
                 self.sb.check_high_score()
         if not self.aliens:
             #destroy existing bullets and create new fleet
-            if self.game_mode == "STORY" and self.story_level.current_phs == 2 and phase_two_done == True:
-                pass
-                # will add start_phs3 here
-            elif self.game_mode == "STORY" and self.story_level.current_phs == 2 and not phase_two_done:
-                pass
-            elif self.game_mode == "STORY" and self.story_level.current_phs == 1:
-                self.story_level.start_phs_two()
+            if self.game_mode == "STORY" and self.story_level.current_phs == 2 and not phase_two_done:
+                self.story_level._make_phs2_alien()
+            elif self.game_mode == "STORY":
+                has_next_phase = self.story_level.start_next_phase()
+                if not has_next_phase:
+                    self.game_mode = "MENU"
+                    pygame.mouse.set_visible(True)
+                    pygame.mixer.music.stop()
             elif self.game_mode == "FREE":
                 self.bullets.empty()
                 self._create_fleet()
