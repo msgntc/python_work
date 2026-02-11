@@ -21,6 +21,8 @@ class Boss(Sprite):
         # spawn the boss
         self.rect.midtop = self.screen_rect.midtop
         self.rect.y += 20
+        self.hitbox = self.rect.inflate(-200, -160)
+        self.hitbox.center = self.rect.center
         
         # initalize boss helth
         self.max_health = self.settings.boss_health

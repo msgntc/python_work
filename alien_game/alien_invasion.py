@@ -158,7 +158,7 @@ class AlienInvasion:
 
     def _start_story_mode(self):
         """start your grand adventure (smilly face emoji)"""
-        self.settings.helth = 2
+        self.settings.helth = 1
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
         self.stats.reset_stats()
@@ -257,15 +257,18 @@ class AlienInvasion:
         phase_two_done = False
         boss_hits = []
         if self.boss is not None:
-            boss_hits = pygame.sprite.spritecollide(
-                self.boss, self.bullets, True)
-        if boss_hits:
-            for _ in boss_hits:
-                boss_dead = self.boss.boss_hit()
-                if boss_dead:
-                    self.boss = None
-                    # will start next phase later
-                    break
+            for bullet in self.bullets.sprites():
+                if self.boss.hitbox.colliderect(bullet.rect):
+                    boss_hits.append(bullet)
+            for bullet in boss_hits:
+                self.bullets.remove(bullet)
+            if boss_hits:
+                for _ in boss_hits:
+                    boss_dead = self.boss.boss_hit()
+                    if boss_dead:
+                        self.boss = None
+                        # will start next phase later
+                        break
         collisions = pygame.sprite.groupcollide(
             self.bullets, self.aliens, True, False)
         if collisions:

@@ -60,7 +60,7 @@ class StoryLevel:
         """spawn a phs2 alien"""
         edge = 250
         phs2_alien = Alien(self.ai_game)
-        phs2_alien.helth = 5
+        phs2_alien.helth = 1
         min_x = edge
         max_x = self.ai_game.settings.screen_width - edge - phs2_alien.rect.width
         if max_x < min_x:
