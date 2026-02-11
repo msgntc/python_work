@@ -261,12 +261,14 @@ class AlienInvasion:
                     alien.helth -= 1
                     if alien.helth <= 0:
                         self.aliens.remove(alien)
-                        self.stats.score += self.settings.alien_points
+                        if self.game_mode == "FREE":
+                            self.stats.score += self.settings.alien_points
                         if self.game_mode == "STORY" and self.story_level.current_phs == 2:
                             phase_done = self.story_level.phs2_alien_killed()
                             phase_two_done = phase_done
-                self.sb.prep_score()
-                self.sb.check_high_score()
+                if self.game_mode == "FREE":
+                    self.sb.prep_score()
+                    self.sb.check_high_score()
         if not self.aliens:
             #destroy existing bullets and create new fleet
             if self.game_mode == "STORY" and self.story_level.current_phs == 2 and not phase_two_done:
