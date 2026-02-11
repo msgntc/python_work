@@ -26,6 +26,9 @@ class Settings:
 
         # boss settings
         self.boss_health = 30
+        self.boss_speed_x = 12
+        self.boss_jitter_y = 3
+        self.boss_dodge_chance = 0.25
 
         # how the game speed up
         self.speedup_scale = 1.25

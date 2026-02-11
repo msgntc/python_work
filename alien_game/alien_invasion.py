@@ -68,8 +68,6 @@ class AlienInvasion:
             elif self.game_mode == "STORY":
                 if self.story_level.current_phs == 1:
                     self.settings.alien_speed = 6
-                else:
-                    pass
                 self.settings.ship_speed = 10
                 self.settings.bullet_speed = 10
                 if not self.dialogue.active:
@@ -78,6 +76,8 @@ class AlienInvasion:
                     self._update_alien_bullets()
                     self._update_aliens()
                     self.ship.update()
+                    if self.boss is not None:
+                        self.boss.update_boss()
             self._update_screen()
             self.clock.tick(60)  
 
@@ -274,6 +274,8 @@ class AlienInvasion:
         if collisions:
             for hit_aliens in collisions.values():
                 for alien in hit_aliens:
+                    if not alien.alive():
+                        continue
                     alien.helth -= 1
                     if alien.helth <= 0:
                         self.aliens.remove(alien)
@@ -288,9 +290,6 @@ class AlienInvasion:
         if not self.aliens:
             if self.boss is not None:
                 return
-            #destroy existing bullets and create new fleet
-            if self.game_mode == "STORY" and self.story_level.current_phs == 2 and not phase_two_done:
-                self.story_level._make_phs2_alien()
             elif self.game_mode == "STORY":
                 has_next_phase = self.story_level.start_next_phase()
                 if not has_next_phase:
@@ -298,6 +297,7 @@ class AlienInvasion:
                     pygame.mouse.set_visible(True)
                     pygame.mixer.music.stop()
             elif self.game_mode == "FREE":
+                #destroy existing bullets and create new fleet
                 self.bullets.empty()
                 self._create_fleet()
                 self.settings.increase_speed()
@@ -319,7 +319,6 @@ class AlienInvasion:
         self.aliens.update()
 
         # look for alien-ship colisions.
-
         hit_alien = pygame.sprite.spritecollideany(self.ship, self.aliens)
         if hit_alien:
             self._ship_hit(hit_alien)
