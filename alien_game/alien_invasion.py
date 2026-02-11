@@ -139,7 +139,7 @@ class AlienInvasion:
         """start free play"""  
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
-        self.settings.helth = 2
+        self.settings.helth = 1
         self.stats.reset_stats()
         self.sb.prep_score()
         self.sb.prep_high_score()
@@ -166,7 +166,7 @@ class AlienInvasion:
 
     def _start_story_mode(self):
         """start your grand adventure (smilly face emoji)"""
-        self.settings.helth = 1
+        self.settings.helth = 2
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
         self.stats.reset_stats()

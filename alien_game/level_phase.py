@@ -10,7 +10,7 @@ class StoryLevel:
         self.ai_game = ai_game
         self.current_phs = 0
         self.phs2_kills = 0
-        self.phase_order = [1, 2, 3, 4]
+        self.phase_order = [1, 2, 1, 1, 2, 1, 2, 2, 3, 4]
         self.phase_index = -1
         self.next_rain_time = 0
         self.rain_stage_order = [0, 1, 2, 1]
@@ -68,7 +68,7 @@ class StoryLevel:
         """spawn a phs2 alien"""
         edge = 250
         phs2_alien = Alien(self.ai_game)
-        phs2_alien.helth = 1
+        phs2_alien.helth = 5
         min_x = edge
         max_x = self.ai_game.settings.screen_width - edge - phs2_alien.rect.width
         if max_x < min_x:
