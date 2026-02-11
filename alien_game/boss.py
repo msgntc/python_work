@@ -42,6 +42,10 @@ class Boss(Sprite):
         # initalize boss helth
         self.max_health = self.settings.boss_health
         self.current_health = self.max_health
+
+        # add boss attacks
+        self.next_rain_time = pygame.time.get_ticks()
+        self.rain_active = False
     
     def blitme(self):
         """draw the boss"""
@@ -90,3 +94,20 @@ class Boss(Sprite):
         self.hitbox.center = self.rect.center
         if self.rect.left <= 0 or self.rect.right >= self.screen_rect.right:
             self.direction_x *= -1
+
+    def spawn_rain_attacks(self):
+        "spawns a shower of bullets"
+        rain_x_positions = []
+        w = self.screen_rect.width
+        left_x = w // 6
+        mid_x = w // 2
+        right_x = (w * 5) // 6
+        lane_centers = [left_x, mid_x, right_x]
+        for center_x in lane_centers:
+            for _ in range(self.settings.boss_rain_bullets_per_side):
+                offset = random.randint(-self.settings.boss_rain_spread_px, self.settings.boss_rain_spread_px)
+                spawn_x = center_x + offset
+                spawn_x = max(0, min(spawn_x,
+                    self.screen_rect.width)) 
+                rain_x_positions.append(spawn_x)
+        return rain_x_positions

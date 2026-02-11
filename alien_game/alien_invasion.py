@@ -78,6 +78,14 @@ class AlienInvasion:
                     self.ship.update()
                     if self.boss is not None:
                         self.boss.update_boss()
+                    if self.story_level.current_phs == 4:
+                       now = pygame.time.get_ticks()
+                       if now >= self.story_level.next_rain_time:
+                           rain_x_positions = self.story_level.get_phase4_rain_positions()
+                           self.story_level.next_rain_time = now + self.settings.boss_rain_interval_ms
+                           for x_pos in rain_x_positions:
+                                self._spawn_enemy_bullet_at_x(x_pos)
+
             self._update_screen()
             self.clock.tick(60)  
 
@@ -181,10 +189,10 @@ class AlienInvasion:
             "I was sent to gather data when I was attacked.",
             "The attacker was a ship almost identical to mine.",
             "I managed to get the ship to flee, but not without setbacks.",
-            "My ship, which usually is much stronger, is in a weekend condition",
+            "My ship, which usually is much stronger, is in a weakend condition",
             "And I fear that this may be detrimental.",
             "My radars have picked up strange energy signals.",
-            "I didn't know what it is...",
+            "I don't know what it is...",
             "...but my guess...",
             "ALIENS"
         ]
@@ -229,7 +237,12 @@ class AlienInvasion:
             self.next_alien_shot_time = this_time + random.randint(120, 300)
         else:
             self.next_alien_shot_time = this_time + random.randint(500, 1500)
-            
+    
+    def _spawn_enemy_bullet_at_x(self, x_pos):
+        """spawn boss bullets"""
+        new_bullet = AlienBullet(self, spawn_x=x_pos)
+        self.alien_bullets.add(new_bullet)
+
     def _update_bullets(self): 
         """updates position of bullets and get rid of of old bullets""" 
         # updates position of bullets
@@ -267,7 +280,7 @@ class AlienInvasion:
                     boss_dead = self.boss.boss_hit()
                     if boss_dead:
                         self.boss = None
-                        # will start next phase later
+                        self.story_level.start_next_phase()
                         break
         collisions = pygame.sprite.groupcollide(
             self.bullets, self.aliens, True, False)
@@ -290,7 +303,7 @@ class AlienInvasion:
         if not self.aliens:
             if self.boss is not None:
                 return
-            elif self.game_mode == "STORY":
+            elif self.game_mode == "STORY" and self.story_level.current_phs in (1, 2):
                 has_next_phase = self.story_level.start_next_phase()
                 if not has_next_phase:
                     self.game_mode = "MENU"
