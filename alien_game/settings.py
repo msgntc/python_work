@@ -21,8 +21,8 @@ class Settings:
         self.helth = 100
         self.alien_bullet_speed = 5
         self.alien_bullet_color = (180, 140, 90)
-        self.phs2_alien = 3
-        self.phs2_alien_speed = 50
+        self.phs2_alien = 10
+        self.phs2_alien_speed = 25
 
 
         # how the game speed up

@@ -64,7 +64,10 @@ class AlienInvasion:
                 self._update_alien_bullets()
                 self._update_aliens()
             elif self.game_mode == "STORY":
-                self.settings.alien_speed = 6
+                if self.story_level.current_phs == 1:
+                    self.settings.alien_speed = 6
+                else:
+                    pass
                 self.settings.ship_speed = 10
                 self.settings.bullet_speed = 10
                 if not self.dialogue.active:
@@ -219,9 +222,12 @@ class AlienInvasion:
         alien_shoot = random.choice(self.aliens.sprites())
         new_bullet = AlienBullet(self, alien_shoot)
         self.alien_bullets.add(new_bullet)
-
-        self.next_alien_shot_time = this_time + random.randint(500, 1500)
-
+        
+        if self.game_mode == "STORY" and self.story_level.current_phs == 2:
+            self.next_alien_shot_time = this_time + random.randint(120, 300)
+        else:
+            self.next_alien_shot_time = this_time + random.randint(500, 1500)
+            
     def _update_bullets(self): 
         """updates position of bullets and get rid of of old bullets""" 
         # updates position of bullets
@@ -246,6 +252,7 @@ class AlienInvasion:
     def _check_bullet_alien_collisions(self):
         """respont to bullet alien colisions""" 
         # check for bullets hitting aliens if true get rid of the bullet and allien
+        phase_two_done = False
         collisions = pygame.sprite.groupcollide(
             self.bullets, self.aliens, True, False)
         if collisions:
@@ -255,17 +262,28 @@ class AlienInvasion:
                     if alien.helth <= 0:
                         self.aliens.remove(alien)
                         self.stats.score += self.settings.alien_points
+                        if self.game_mode == "STORY" and self.story_level.current_phs == 2:
+                            phase_done = self.story_level.phs2_alien_killed()
+                            phase_two_done = phase_done
                 self.sb.prep_score()
                 self.sb.check_high_score()
         if not self.aliens:
             #destroy existing bullets and create new fleet
-            self.bullets.empty()
-            self._create_fleet()
-            self.settings.increase_speed()
+            if self.game_mode == "STORY" and self.story_level.current_phs == 2 and phase_two_done == True:
+                pass
+                # will add start_phs3 here
+            elif self.game_mode == "STORY" and self.story_level.current_phs == 2 and not phase_two_done:
+                pass
+            elif self.game_mode == "STORY" and self.story_level.current_phs == 1:
+                self.story_level.start_phs_two()
+            elif self.game_mode == "FREE":
+                self.bullets.empty()
+                self._create_fleet()
+                self.settings.increase_speed()
 
-            # increase level
-            self.stats.level += 1 
-            self.sb.prep_level()
+                # increase level
+                self.stats.level += 1 
+                self.sb.prep_level()
     
     def _check_alien_bulets_ship_colisoins(self):
         """check if an alien bullet hit the ship"""
@@ -315,7 +333,12 @@ class AlienInvasion:
     def _check_fleet_edges(self):
         """respond apropetly if a alien reches an egde"""
         for alein in self.aliens.sprites():
-            if alein.check_edges():
+            if self.game_mode == "STORY" and self.story_level.current_phs == 2:
+                edge = 250
+                if alein.rect.right >= self.settings.screen_width - edge or alein.rect.left <= edge:
+                    self._change_fleet_direction()
+                    break
+            elif alein.check_edges():
                 self._change_fleet_direction()
                 break
 
