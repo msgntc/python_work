@@ -61,6 +61,12 @@ class AlienInvasion:
             Button(self, "lvl_3", "Level three", 880, 420, 260, 40)
         ]
 
+    def _ensure_bg_music(self):
+        """Start background music if it is not already playing."""
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load("song/song.mp3")
+            pygame.mixer.music.play(-1)
+
     def run_game(self):
         """start the main loop for the game"""
         while True:
@@ -131,12 +137,14 @@ class AlienInvasion:
                                 self.aliens.empty()
                                 self.boss = None
                                 self.dialogue = None
+                                pygame.mixer.music.stop()
                                 self.game_mode = "LEVEL_SELECT"
                                 pygame.mouse.set_visible(True)
                                 continue
                             else:
                                 self.dialogue = None
-                                self.story_level.start_story()
+                                self.story_level.start_leval_one()
+                                self._ensure_bg_music()
                                 continue
                     self._check_button_pressed(mouse_pos)
 
@@ -176,17 +184,7 @@ class AlienInvasion:
 
             if button_clicked:
                 if butten_selected == "lvl_1":
-                    self.settings.initialize_dynamic_settings()
-                    self.settings.helth = 1
-                    self.stats.reset_stats()
-                    self.sb.prep_score()
-                    self.sb.prep_high_score()
-                    self.sb.prep_level()
-                    self.sb.prep_ships()
-                    self.dialogue = None
-                    self.game_mode = "STORY"
-                    pygame.mouse.set_visible(False)
-                    self.story_level.start_leval_one()
+                    self._start_story_mode()
             return
 
     def _start_free_play(self):
@@ -215,8 +213,7 @@ class AlienInvasion:
 
             # play a song
         if self.game_mode == "FREE":
-                pygame.mixer.music.load("song/song.mp3")
-                pygame.mixer.music.play(-1)
+                self._ensure_bg_music()
 
     def _start_story_mode(self):
         """start your grand adventure (smilly face emoji)"""

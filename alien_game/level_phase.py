@@ -10,7 +10,7 @@ class StoryLevel:
         self.ai_game = ai_game
         self.current_phs = 0
         self.phs2_kills = 0
-        self.phase_order = [1, 2, 1, 1, 2, 1, 2, 2, 3, 4, 5]
+        self.phase_order = [1, 2, 3, 4, 5]
         self.phase_index = -1
         self.next_rain_time = 0
         self.rain_stage_order = [0, 1, 2, 1]
@@ -50,6 +50,8 @@ class StoryLevel:
     def start_phs_one(self):
         """progress the story"""
         self.current_phs = 1
+        # Ensure phase 1 fleet always uses 1 health aliens.
+        self.ai_game.settings.helth = 2
         pygame.mouse.set_visible(False)
         self.ai_game.bullets.empty()
         self.ai_game.alien_bullets.empty()
