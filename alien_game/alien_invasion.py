@@ -78,10 +78,10 @@ class AlienInvasion:
                 self.settings.bullet_speed = 10
                 if (self.story_level.level_one_boss_complete and not self.story_level.level_one_complete and
                      (self.dialogue is None or not self.dialogue.active)):
-                    lines = ["That was a very strange encounter,"
-                             "Major repairs will be needed on the way to the wormhole,"
-                             "I have also found some kind of alien technology,"
-                             "Further study will determine whether it can be useful."
+                    lines = ["That was a very strange encounter",
+                             "Major repairs will be needed on the way to the wormhole",
+                             "I have also found some kind of alien technology",
+                             "Further study will determine whether it can be useful",
                     ]
                     self.bullets.empty()
                     self.alien_bullets.empty()
@@ -126,8 +126,14 @@ class AlienInvasion:
                         if finished:
                             if self.story_level.level_one_boss_complete == True and not self.story_level.level_one_complete:
                                 self.story_level.level_one_complete = True
+                                self.bullets.empty()
+                                self.alien_bullets.empty()
+                                self.aliens.empty()
+                                self.boss = None
                                 self.dialogue = None
-                                # will add start next leval later
+                                self.game_mode = "LEVEL_SELECT"
+                                pygame.mouse.set_visible(True)
+                                continue
                             else:
                                 self.dialogue = None
                                 self.story_level.start_story()
@@ -214,7 +220,7 @@ class AlienInvasion:
 
     def _start_story_mode(self):
         """start your grand adventure (smilly face emoji)"""
-        self.settings.helth = 1
+        self.settings.helth = 2
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
         self.stats.reset_stats()
