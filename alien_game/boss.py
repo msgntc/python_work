@@ -111,3 +111,4 @@ class Boss(Sprite):
                     self.screen_rect.width)) 
                 rain_x_positions.append(spawn_x)
         return rain_x_positions
+    

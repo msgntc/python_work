@@ -70,7 +70,20 @@ class AlienInvasion:
                     self.settings.alien_speed = 6
                 self.settings.ship_speed = 10
                 self.settings.bullet_speed = 10
-                if not self.dialogue.active:
+                if (self.story_level.level_one_boss_complete and not self.story_level.level_one_complete and
+                     (self.dialogue is None or not self.dialogue.active)):
+                    lines = ["That was a very strange encounter,"
+                             "Major repairs will be needed on the way to the wormhole,"
+                             "I have also found some kind of alien technology,"
+                             "Further study will determine whether it can be useful."
+                    ]
+                    self.bullets.empty()
+                    self.alien_bullets.empty()
+                    pygame.mouse.set_visible(True)
+                    self.dialogue = Dialogue(self, lines)
+                    continue
+                   
+                if not self.dialogue or not self.dialogue.active:
                     self._update_bullets()
                     self._fire_alien_bullet()
                     self._update_alien_bullets()
@@ -85,6 +98,8 @@ class AlienInvasion:
                            self.story_level.next_rain_time = now + self.settings.boss_rain_interval_ms
                            for x_pos in rain_x_positions:
                                 self._spawn_enemy_bullet_at_x(x_pos)
+                    if self.story_level.current_phs == 5:
+                        self.story_level._spawn_twins()
 
             self._update_screen()
             self.clock.tick(60)  
@@ -103,8 +118,14 @@ class AlienInvasion:
                     if self.game_mode == "STORY" and self.dialogue and self.dialogue.active:
                         finished = self.dialogue.handle_click(mouse_pos)
                         if finished:
-                            self.story_level.start_story()
-                            continue
+                            if self.story_level.level_one_boss_complete == True and not self.story_level.level_one_complete:
+                                self.story_level.level_one_complete = True
+                                self.dialogue = None
+                                # will add start next leval later
+                            else:
+                                self.dialogue = None
+                                self.story_level.start_story()
+                                continue
                     self._check_button_pressed(mouse_pos)
 
     def _check_button_pressed(self, mouse_pos):
@@ -166,7 +187,7 @@ class AlienInvasion:
 
     def _start_story_mode(self):
         """start your grand adventure (smilly face emoji)"""
-        self.settings.helth = 2
+        self.settings.helth = 1
         self.settings.initialize_dynamic_settings()
         # Reset the game satistics
         self.stats.reset_stats()
@@ -233,7 +254,9 @@ class AlienInvasion:
         new_bullet = AlienBullet(self, alien_shoot)
         self.alien_bullets.add(new_bullet)
         
-        if self.game_mode == "STORY" and self.story_level.current_phs == 2:
+        if self.game_mode == "STORY" and self.story_level.current_phs == 5:
+            self.next_alien_shot_time = this_time + random.randint(80, 180)
+        elif self.game_mode == "STORY" and self.story_level.current_phs == 2:
             self.next_alien_shot_time = this_time + random.randint(120, 300)
         else:
             self.next_alien_shot_time = this_time + random.randint(500, 1500)
