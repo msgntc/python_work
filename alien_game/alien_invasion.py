@@ -52,7 +52,13 @@ class AlienInvasion:
         Button(self, "story", "Story Mode", 350, 413, 200, 50),
         Button(self, "free play", "Free Play", 800, 413, 200, 50),
         Button(self, "time", "A 5 minute experience", 800, 500, 200, 0),
-        Button(self, "S_time", "A 15 minute experience", 350, 500, 200, 0),
+        Button(self, "S_time", "A 15 minute experience", 350, 500, 200, 0)
+        ]
+
+        self.level_buttons = [
+            Button(self, "lvl_1", "Level one", 280, 420, 260, 40),
+            Button(self, "lvl_2", "Level two", 580, 420, 260, 40),
+            Button(self, "lvl_3", "Level three", 880, 420, 260, 40)
         ]
 
     def run_game(self):
@@ -133,28 +139,49 @@ class AlienInvasion:
         button_clicked = False
         butten_selected = None
 
-        # Only allow button clicks from the menu
-        if self.game_mode != "MENU":
+        if self.game_mode == "MENU":
+            for butten in self.buttons:
+                if butten.name == "free play":
+                    if butten.rect.collidepoint(mouse_pos):
+                        button_clicked = True
+                        butten_selected = "FREE"
+                        break
+
+                elif butten.name == "story":
+                    if butten.rect.collidepoint(mouse_pos):
+                        button_clicked = True
+                        butten_selected = "LEVEL_SELECT"
+                        break
+
+            if button_clicked:
+                if butten_selected == "FREE":
+                    self._start_free_play()
+                elif butten_selected == "LEVEL_SELECT":
+                    self.game_mode = "LEVEL_SELECT"
+                    pygame.mouse.set_visible(True)
             return
 
-        for butten in self.buttons:
-            if butten.name == "free play":
+        if self.game_mode == "LEVEL_SELECT":
+            for butten in self.level_buttons:
                 if butten.rect.collidepoint(mouse_pos):
                     button_clicked = True
-                    butten_selected = "FREE"
+                    butten_selected = butten.name
                     break
 
-            elif butten.name == "story":
-                if butten.rect.collidepoint(mouse_pos):
-                    button_clicked = True
-                    butten_selected = "STORY"
-                    break
-
-        if button_clicked:
-            if butten_selected == "FREE":
-                self._start_free_play()
-            elif butten_selected == "STORY":
-                self._start_story_mode()
+            if button_clicked:
+                if butten_selected == "lvl_1":
+                    self.settings.initialize_dynamic_settings()
+                    self.settings.helth = 1
+                    self.stats.reset_stats()
+                    self.sb.prep_score()
+                    self.sb.prep_high_score()
+                    self.sb.prep_level()
+                    self.sb.prep_ships()
+                    self.dialogue = None
+                    self.game_mode = "STORY"
+                    pygame.mouse.set_visible(False)
+                    self.story_level.start_leval_one()
+            return
 
     def _start_free_play(self):
         """start free play"""  
@@ -428,6 +455,12 @@ class AlienInvasion:
              bullet.draw_bullet()
          self.ship.blitme()
          self.aliens.draw(self.screen)
+
+         if self.game_mode == "LEVEL_SELECT":
+             for butten in self.level_buttons:
+                 butten.draw_button()
+             pygame.display.flip()
+             return
 
          # draw the score information
          self.sb.show_score()

@@ -188,3 +188,22 @@ class StoryLevel:
         new_alien.rect.y = 0
         self.ai_game.aliens.add(new_alien)
         
+    def start_leval_one(self):
+        """start the first level"""
+        self.phase_index = -1
+        self.current_phs = 0
+        self.level_one_boss_complete = False
+        self.level_one_complete = False
+        self.phs2_kills = 0
+        self.phs4_volleys = 0
+        self.rain_stage_index = 0
+        self.rain_stage = self.rain_stage_order[self.rain_stage_index]
+        self.rain_stage_shots = 0
+        self.next_rain_time = pygame.time.get_ticks()
+        self.phs5_step = 0
+        self.phs5_spawned_twins = False
+        self.ai_game.bullets.empty()
+        self.ai_game.alien_bullets.empty()
+        self.ai_game.aliens.empty()
+        self.ai_game.boss = None
+        return self.start_next_phase()
