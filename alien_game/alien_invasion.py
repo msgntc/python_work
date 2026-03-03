@@ -13,8 +13,8 @@ from ship import Ship
 from bullet import Bullet
 from aliens_bullets import AlienBullet
 from alien import Alien
-from boss import Boss
 from level_phase import StoryLevel
+from lvl2_phase import Lvl2
 
 class AlienInvasion:
     """overall class to manage game assets and behavior"""
@@ -35,6 +35,7 @@ class AlienInvasion:
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
         self.story_level = StoryLevel(self)
+        self.lvl2 = Lvl2(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group() 
@@ -185,6 +186,11 @@ class AlienInvasion:
             if button_clicked:
                 if butten_selected == "lvl_1":
                     self._start_story_mode()
+                elif butten_selected == "lvl_2":
+                    self.game_mode = "STORY"
+                    self.dialogue = None
+                    pygame.mouse.set_visible(False)
+                    self.lvl2.start_lvl2()
             return
 
     def _start_free_play(self):

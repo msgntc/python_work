@@ -23,7 +23,7 @@ class Settings:
         self.alien_bullet_color = (180, 140, 90)
         self.phs2_alien = 5
         self.phs2_alien_speed = 25
-        self.phs2_alien_health = 5
+        self.phs2_alien_health = 1
 
         # boss settings
         self.boss_health = 30

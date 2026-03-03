@@ -3,6 +3,5 @@ import math
 import string
 cases = int(sys.stdin.readline().rstrip())
 for caseNum in range(cases):
-    data = sys.stdin.readline().rstrip()
-    sentince = string("")
+     
     print(sys.stdin.readline().rstrip())

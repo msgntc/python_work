@@ -51,7 +51,7 @@ class StoryLevel:
         """progress the story"""
         self.current_phs = 1
         # Ensure phase 1 fleet always uses 1 health aliens.
-        self.ai_game.settings.helth = 2
+        self.ai_game.settings.helth = 1
         pygame.mouse.set_visible(False)
         self.ai_game.bullets.empty()
         self.ai_game.alien_bullets.empty()
