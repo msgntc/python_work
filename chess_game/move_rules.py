@@ -13,7 +13,7 @@ class MoveRules():
         if piece_tipe == "P":
             return self._pawn_move(move)
         if piece_tipe == "R":
-            return self._pawn_move(move)
+            return self._rook_move(move)
         return False
     
     def _pawn_move(self, move):
@@ -52,10 +52,20 @@ class MoveRules():
                     row_step = 1
                 else:
                     row_step = -1
-                    
-            if move.start_row == move.end_row:
-                column_step = 1
-            else:
-                 column_step = -1 
+                for row in range(move.start_row + row_step, move.end_row, row_step):
+                    if self.board[row][move.start_column] != "--":
+                        return False
 
-        
+            if move.start_row == move.end_row:
+                if move.end_column > move.start_column:
+                    column_step = 1
+                else:
+                    column_step = -1 
+                for column in range(move.start_column + column_step, move.end_column, column_step):
+                            if self.board[move.start_row][column] != "--":
+                                return False
+            target_piece = self.board[move.end_row][move.end_column]
+            if  target_piece != "--" and target_piece[0] == move.piece[0]:
+                return False
+            else:
+                return True
