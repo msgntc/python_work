@@ -6,6 +6,7 @@ from move import Move
 
 class ChessGame():
     """an overall class to manage chess_game"""
+    
     def __init__(self):
         """initalize values"""
         self.settings = Settings()
@@ -43,11 +44,12 @@ class ChessGame():
             self._draw_pieces()
             pygame.display.flip()
             self.clock.tick(60)
+
     def _draw_board(self):
         """draw a chess bord"""
         for row in range(self.settings.board_size):
             for column in range(self.settings.board_size):
-                if (row + column) %2 == 0:
+                if (row + column) % 2 == 0:
                     square_color = self.settings.light_square
                 else:
                     square_color = self.settings.dark_square
@@ -57,6 +59,7 @@ class ChessGame():
                 square_rect = pygame.Rect(x, y,
                          self.settings.square_size, self.settings.square_size)
                 pygame.draw.rect(self.screen, square_color, square_rect)
+
     def _draw_pieces(self):
         for row in range(self.settings.board_size):
             for column in range(self.settings.board_size):
@@ -69,6 +72,7 @@ class ChessGame():
                         x + self.settings.square_size // 2,
                         y + self.settings.square_size // 2))
                     self.screen.blit(piece_text, piece_rect)
+
     def _check_board_click(self, mouse_pos):
         """check if the player clicked on the board"""
         mouse_x, mouse_y = mouse_pos

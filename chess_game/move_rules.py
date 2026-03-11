@@ -1,5 +1,6 @@
 class MoveRules():
     """a class for the rules in chess"""
+
     def __init__(self, board):
         """ initalize all my atrabutes"""
         self.board = board
@@ -14,6 +15,7 @@ class MoveRules():
         if piece_tipe == "R":
             return self._pawn_move(move)
         return False
+    
     def _pawn_move(self, move):
         """check if a pawn move is valid"""
         if move.piece.startswith("w"):
@@ -37,5 +39,23 @@ class MoveRules():
              and target_piece != "--" and target_piece[0] != move.piece[0]):
             return True
         return False
+    
     def _rook_move(self, move):
         """check if a rook move is valid"""
+        if move.start_column == move.end_column and move.start_row == move.end_row:
+            return False
+        elif move.start_column != move.end_column and move.start_row != move.end_row:
+            return False
+        else:
+            if move.start_column == move.end_column:
+                if move.end_row > move.start_row:
+                    row_step = 1
+                else:
+                    row_step = -1
+                    
+            if move.start_row == move.end_row:
+                column_step = 1
+            else:
+                 column_step = -1 
+
+        
