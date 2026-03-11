@@ -2,6 +2,7 @@ import pygame
 import sys
 from settings import Settings
 from move_rules import MoveRules
+from move import Move
 
 class ChessGame():
     """an overall class to manage chess_game"""
@@ -22,6 +23,7 @@ class ChessGame():
                       ["--", "--", "--", "--", "--", "--", "--","--"],
                       ["wP", "wP", "wP", "wP", "wP", "wP", "wP","wP"],
                       ["wR", "wKn", "wB", "wQ", "wK", "wB", "wKn","wR"]]
+        self.move_rules = MoveRules(self.board)
         self.turn = "w"
         self.font = pygame.font.SysFont(None, 36)
         pygame.display.set_caption("Chess Masters: Thqt0ne6uy")
@@ -75,6 +77,8 @@ class ChessGame():
         board_right = board_left + self.settings.board_pixels
         board_bottom = board_top + self.settings.board_pixels
 
+
+
         if board_left <= mouse_x < board_right and board_top <= mouse_y < board_bottom:
             column = (mouse_x - board_left) // self.settings.square_size
             row = (mouse_y - board_top) // self.settings.square_size
@@ -93,14 +97,16 @@ class ChessGame():
                 self.selected_piece = piece
             else:
                 start_row, start_column = self.selected_square
-                self.board[row][column] = self.selected_piece
-                self.board[start_row][start_column] = "--"
-                self.selected_square = None
-                self.selected_piece = None
-                if self.turn == "w":
-                    self.turn = "b"
-                else:
-                    self.turn = "w"
+                move = Move(start_row, start_column, row, column, self.selected_piece)
+                if self.move_rules.is_valid_move(move):
+                    self.board[row][column] = self.selected_piece
+                    self.board[start_row][start_column] = "--"
+                    self.selected_square = None
+                    self.selected_piece = None
+                    if self.turn == "w":
+                        self.turn = "b"
+                    else:
+                        self.turn = "w"
 
     def _highlited_square(self):
         """a methed to show what pies is selected"""
