@@ -1,4 +1,4 @@
-class Settings:
+class Settings():
     """A class for settings. set = settings"""
     def __init__(self):
         """intialize the games static set"""
@@ -15,4 +15,5 @@ class Settings:
         self.dark_square = (181, 136, 99)
         self.board_x = (self.screen_width - self.board_pixels) // 2
         self.board_y = (self.screen_height - self.board_pixels) // 2
+        self.highlight_color = (255, 255, 0)
         
