@@ -16,6 +16,12 @@ class ChessGame():
         self.screen_rect = self.screen.get_rect()
         self.selected_square = None
         self.selected_piece = None
+        self.white_king_moved = False
+        self.black_king_moved = False
+        self.white_left_rook_moved = False
+        self.white_right_rook_moved = False
+        self.black_right_rook_moved = False
+        self.black_left_rook_moved = False
         self.board = [["bR", "bN", "bB", "bQ", "bK", "bB", "bN","bR"],
                       ["bP", "bP", "bP", "bP", "bP", "bP", "bP","bP"],
                       ["--", "--", "--", "--", "--", "--", "--","--"],
@@ -24,7 +30,7 @@ class ChessGame():
                       ["--", "--", "--", "--", "--", "--", "--","--"],
                       ["wP", "wP", "wP", "wP", "wP", "wP", "wP","wP"],
                       ["wR", "wN", "wB", "wQ", "wK", "wB", "wN","wR"]]
-        self.move_rules = MoveRules(self.board)
+        self.move_rules = MoveRules(self.board, self)
         self.turn = "w"
         self.font = pygame.font.SysFont(None, 36)
         pygame.display.set_caption("Chess Masters: Thqt0ne6uy")

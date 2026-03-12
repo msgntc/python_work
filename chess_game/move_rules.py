@@ -1,10 +1,10 @@
 class MoveRules():
     """a class for the rules in chess"""
 
-    def __init__(self, board):
+    def __init__(self, board, game):
         """ initalize all my atrabutes"""
         self.board = board
-
+        self.game = game
     def is_valid_move(self, move):
         """check wich piese was selected"""
         if move.piece == "--":
@@ -131,6 +131,8 @@ class MoveRules():
         column_diff = abs(move.start_column - move.end_column)
         target_piece = self.board[move.end_row][move.end_column]
         if  row_diff == 0 and column_diff == 0:
+            if row_diff == 0 and column_diff == 2:
+                return self._castle_move(move)
             return False
         elif row_diff > 1 or column_diff > 1:
             return False
@@ -138,3 +140,40 @@ class MoveRules():
              return False
         else:
             return True
+    
+    def _castle_move(self, move):
+        """see if you can castle"""
+        if move.piece.startswith("w"):
+            back_row = 7
+            if self.game.white_king_moved == True:
+                return False
+        else:
+            back_row = 0
+            if self.game.black_king_moved == True:
+                return False
+        if move.start_row != back_row or move.end_row != back_row:
+            return False
+        if move.end_column > move.start_column:
+            rook_column = 7
+            if move.piece.startswith("w"):
+                if self.game.white_right_rook_moved:
+                    return False
+            else:
+                if self.game.black_right_rook_moved:
+                    return False
+        else:
+            rook_column = 0
+            if move.piece.startswith("w"):
+                if self.game.white_right_rook_moved:
+                    return False
+            else:
+                if self.game.black_right_rook_moved:
+                    return False 
+        rook_piece = self.board[back_row][rook_column]
+        if move.piece == ("wK"):
+            expected_rook = ("wR")
+        else:
+            expected_rook = ("bR")
+        if rook_piece != expected_rook:
+            return False
+            
