@@ -15,7 +15,11 @@ class MoveRules():
         if piece_tipe == "R":
             return self._rook_move(move)
         if piece_tipe == "B":
-            return self._bishop_move(move)    
+            return self._bishop_move(move) 
+        if piece_tipe == "Q":
+            return self._queen_move(move)
+        if piece_tipe == "N":
+            return self._knight_move(move)
         return False
     
     def _pawn_move(self, move):
@@ -97,4 +101,25 @@ class MoveRules():
              return False
         else:
             return True    
-                    
+    
+    def _queen_move(self, move):
+        """check if a queen move is valid"""
+        if move.start_row == move.end_row or move.start_column == move.end_column:
+            return self._rook_move(move)
+        elif abs(move.start_row - move.end_row) == abs(move.start_column - move.end_column):
+            return self._bishop_move(move)
+        else:
+            return False
+        
+    def _knight_move(self, move):
+        """check if a knigt move is valid"""
+        target_piece = self.board[move.end_row][move.end_column]
+        row_diff = abs(move.start_row - move.end_row)
+        column_diff = abs(move.start_column - move.end_column)
+        if not ((row_diff == 2 and column_diff == 1) or (row_diff == 1 and column_diff == 2)):
+            return False
+        elif  target_piece != "--" and target_piece[0] == move.piece[0]:
+             return False
+        else: 
+            return True
+        

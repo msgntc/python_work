@@ -16,14 +16,14 @@ class ChessGame():
         self.screen_rect = self.screen.get_rect()
         self.selected_square = None
         self.selected_piece = None
-        self.board = [["bR", "bKn", "bB", "bQ", "bK", "bB", "bKn","bR"],
+        self.board = [["bR", "bN", "bB", "bQ", "bK", "bB", "bN","bR"],
                       ["bP", "bP", "bP", "bP", "bP", "bP", "bP","bP"],
                       ["--", "--", "--", "--", "--", "--", "--","--"],
                       ["--", "--", "--", "--", "--", "--", "--","--"],
                       ["--", "--", "--", "--", "--", "--", "--","--"],
                       ["--", "--", "--", "--", "--", "--", "--","--"],
                       ["wP", "wP", "wP", "wP", "wP", "wP", "wP","wP"],
-                      ["wR", "wKn", "wB", "wQ", "wK", "wB", "wKn","wR"]]
+                      ["wR", "wN", "wB", "wQ", "wK", "wB", "wN","wR"]]
         self.move_rules = MoveRules(self.board)
         self.turn = "w"
         self.font = pygame.font.SysFont(None, 36)
