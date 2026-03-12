@@ -14,6 +14,8 @@ class MoveRules():
             return self._pawn_move(move)
         if piece_tipe == "R":
             return self._rook_move(move)
+        if piece_tipe == "B":
+            return self._bishop_move(move)    
         return False
     
     def _pawn_move(self, move):
@@ -69,3 +71,30 @@ class MoveRules():
                 return False
             else:
                 return True
+    
+    def _bishop_move(self, move):
+        """check if a bishop move is valid"""
+        if move.start_column == move.end_column and move.start_row == move.end_row:
+            return False
+        elif abs(move.start_row - move.end_row) != abs(move.start_column - move.end_column):
+            return False
+        else:
+            if move.end_row > move.start_row:
+                row_step = 1
+            else:
+                row_step = -1
+            if move.end_column > move.start_column:
+                column_step = 1
+            else:
+                column_step = -1
+            for step in range(1, abs(move.end_row - move.start_row)):
+                row = move.start_row + step * row_step
+                column = move.start_column + step * column_step
+                if self.board[row][column] != "--":
+                    return False
+        target_piece = self.board[move.end_row][move.end_column]
+        if  target_piece != "--" and target_piece[0] == move.piece[0]:
+             return False
+        else:
+            return True    
+                    

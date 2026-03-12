@@ -81,8 +81,6 @@ class ChessGame():
         board_right = board_left + self.settings.board_pixels
         board_bottom = board_top + self.settings.board_pixels
 
-
-
         if board_left <= mouse_x < board_right and board_top <= mouse_y < board_bottom:
             column = (mouse_x - board_left) // self.settings.square_size
             row = (mouse_y - board_top) // self.settings.square_size
