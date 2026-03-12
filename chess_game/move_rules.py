@@ -164,10 +164,10 @@ class MoveRules():
         else:
             rook_column = 0
             if move.piece.startswith("w"):
-                if self.game.white_right_rook_moved:
+                if self.game.white_left_rook_moved:
                     return False
             else:
-                if self.game.black_right_rook_moved:
+                if self.game.black_left_rook_moved:
                     return False 
         rook_piece = self.board[back_row][rook_column]
         if move.piece == ("wK"):
@@ -176,4 +176,11 @@ class MoveRules():
             expected_rook = ("bR")
         if rook_piece != expected_rook:
             return False
-            
+        if rook_column > move.start_column:
+            step = 1
+        else:
+            step = -1
+        for column in range(move.start_column + step, rook_column, step):
+            if self.board[back_row][column] != "--":
+                return False
+        return True    

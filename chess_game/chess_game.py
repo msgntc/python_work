@@ -98,7 +98,7 @@ class ChessGame():
                 self.selected_piece = piece
         elif self.selected_square == (row, column):
             self.selected_square = None
-            self.selected_piece = None
+            self.selected_piece = None           
         else:
             if piece != "--" and piece.startswith(self.turn):
                 self.selected_square = (row, column)
@@ -107,6 +107,24 @@ class ChessGame():
                 start_row, start_column = self.selected_square
                 move = Move(start_row, start_column, row, column, self.selected_piece)
                 if self.move_rules.is_valid_move(move):
+                    if ((self.selected_piece == "wK" or self.selected_piece == "bK")
+                        and abs(column - start_column) == 2):
+                        if column > start_column:
+                            rook_piece = self.board[row][7]
+                            self.board[row][5] = rook_piece
+                            self.board[row][7] = "--"
+                        else:
+                            rook_piece = self.board[row][0]
+                            self.board[row][3] = rook_piece
+                            self.board[row][0] = "--"
+                    if self.selected_piece == "wK":
+                        self.white_king_moved = True
+                    if self.selected_piece == "bK":
+                        self.black_king_moved = True
+                    if self.selected_piece == "wR" and self.selected_piece[7][0]:
+                        self.white_left_rook_moved = True
+                    if self.selected_piece == "wR" and self.selected_piece[7][0]:
+                        self.white_left_rook_moved = True
                     self.board[row][column] = self.selected_piece
                     self.board[start_row][start_column] = "--"
                     self.selected_square = None
