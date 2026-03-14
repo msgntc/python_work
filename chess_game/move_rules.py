@@ -184,3 +184,4 @@ class MoveRules():
             if self.board[back_row][column] != "--":
                 return False
         return True    
+    
