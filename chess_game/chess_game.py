@@ -87,10 +87,12 @@ class ChessGame():
         board_right = board_left + self.settings.board_pixels
         board_bottom = board_top + self.settings.board_pixels
 
-        if board_left <= mouse_x < board_right and board_top <= mouse_y < board_bottom:
-            column = (mouse_x - board_left) // self.settings.square_size
-            row = (mouse_y - board_top) // self.settings.square_size
-            piece = self.board[row][column]
+        if not (board_left <= mouse_x < board_right and board_top <= mouse_y < board_bottom):
+            return
+
+        column = (mouse_x - board_left) // self.settings.square_size
+        row = (mouse_y - board_top) // self.settings.square_size
+        piece = self.board[row][column]
 
         if self.selected_square is None:
             if piece != "--" and piece.startswith(self.turn):
@@ -107,6 +109,7 @@ class ChessGame():
                 start_row, start_column = self.selected_square
                 move = Move(start_row, start_column, row, column, self.selected_piece)
                 if self.move_rules.is_valid_move(move):
+                    moved_piece = self.selected_piece
                     if ((self.selected_piece == "wK" or self.selected_piece == "bK")
                         and abs(column - start_column) == 2):
                         if column > start_column:
@@ -117,22 +120,30 @@ class ChessGame():
                             rook_piece = self.board[row][0]
                             self.board[row][3] = rook_piece
                             self.board[row][0] = "--"
-                    if self.selected_piece == "wK":
-                        self.white_king_moved = True
-                    if self.selected_piece == "bK":
-                        self.black_king_moved = True
-                    if self.selected_piece == "wR" and self.selected_piece[7][0]:
-                        self.white_left_rook_moved = True
-                    if self.selected_piece == "wR" and self.selected_piece[7][0]:
-                        self.white_left_rook_moved = True
                     self.board[row][column] = self.selected_piece
                     self.board[start_row][start_column] = "--"
+                    self._update_move_flags(moved_piece, start_row, start_column)
                     self.selected_square = None
                     self.selected_piece = None
                     if self.turn == "w":
                         self.turn = "b"
                     else:
                         self.turn = "w"
+
+    def _update_move_flags(self, moved_piece, start_row, start_column):
+        """Track whether kings and corner rooks have moved."""
+        if moved_piece == "wK":
+            self.white_king_moved = True
+        elif moved_piece == "bK":
+            self.black_king_moved = True
+        elif moved_piece == "wR" and start_row == 7 and start_column == 0:
+            self.white_left_rook_moved = True
+        elif moved_piece == "wR" and start_row == 7 and start_column == 7:
+            self.white_right_rook_moved = True
+        elif moved_piece == "bR" and start_row == 0 and start_column == 0:
+            self.black_left_rook_moved = True
+        elif moved_piece == "bR" and start_row == 0 and start_column == 7:
+            self.black_right_rook_moved = True
 
     def _highlited_square(self):
         """a methed to show what pies is selected"""

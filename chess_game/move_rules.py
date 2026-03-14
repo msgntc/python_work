@@ -130,9 +130,9 @@ class MoveRules():
         row_diff = abs(move.start_row - move.end_row)
         column_diff = abs(move.start_column - move.end_column)
         target_piece = self.board[move.end_row][move.end_column]
-        if  row_diff == 0 and column_diff == 0:
-            if row_diff == 0 and column_diff == 2:
+        if row_diff == 0 and column_diff == 2:
                 return self._castle_move(move)
+        if  row_diff == 0 and column_diff == 0:
             return False
         elif row_diff > 1 or column_diff > 1:
             return False
