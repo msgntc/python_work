@@ -42,10 +42,10 @@ def new_entry(request, topic_id):
 
     if request.method != 'POST':
         # no data submited blanck form
-        form = TopicForm()
+        form = EntryForm()
     else:
         # post data submited; prosess data.
-        form = TopicForm(data=request.POST)
+        form = EntryForm(data=request.POST)
         if form.is_valid():
             new_entry = form.save(commit=False)
             new_entry.topic = topic
