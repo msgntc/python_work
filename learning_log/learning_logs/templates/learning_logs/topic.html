@@ -5,7 +5,7 @@
   <p>Topic: {{ topic.text }}</p>
 
   <p>Entries:</p>
-  <url>
+  <ul>
     {% for entry in entries %}
       <li>
         <p>{{entry.date_added|date:'M d, Y H:i' }}</p>
@@ -14,5 +14,5 @@
     {% empty %}
       <li>There are no entries for this topic yet.</li>
     {% endfor %}
-  </url>
+  </ul>
 {% endblock content %}
