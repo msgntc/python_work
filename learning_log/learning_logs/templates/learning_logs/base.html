@@ -57,7 +57,7 @@
     {% if user.is_authenticated %}
         Hello, {{ user.username }}.
     {% else %}
-        <a href="{% url 'accounts:register' %}">Register</a>-
+        <a href="{% url 'accounts:register' %}">Register</a> -
         <a href="{% url 'accounts:login' %}">Log in</a>
     {% endif %}
 </p>
@@ -68,10 +68,10 @@
 
 {% if user.is_authenticated %}
   <hr />
-  <from action="{% url 'accounts:logout' %}" method='post'>
+  <form action="{% url 'accounts:logout' %}" method='post'>
     {% csrf_token %}
     <button name='submit'> Log out</button>
-  </from>
+  </form>
 {% endif %}
 </body>
 </html>
