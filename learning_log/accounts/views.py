@@ -11,13 +11,12 @@ def register(request):
         # prosses compleated form
         form = UserCreationForm(data=request.POST)
 
-        if form.is_valid():
+        if form.is_valid(): 
             new_user = form.save()
             # log in the user and then dirext them to the home page
             login(request, new_user)
             return redirect('learning_logs:index')
-        # desplay a blank or invalid form
-        context = {'form': form}
-        return render(request, 'registration/register.html', context)
+    # desplay a blank or invalid form
+    context = {'form': form}
+    return render(request, 'registration/register.html', context)
 
-# Create your views here.
