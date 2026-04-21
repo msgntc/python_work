@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
@@ -7,6 +8,7 @@ def index(request):
     """the home page for learning_log"""
     return render(request, 'learning_logs/index.html')
 
+@login_required
 def topics(request):
     """show all topics."""
     topics = Topic.objects.order_by('date_added')
@@ -73,4 +75,3 @@ def edit_entry(request, entry_id):
         
     context = {'entry': entry, 'topic': topic, 'form': form}
     return render(request, 'learning_logs/edit_entry.html', context)
-
