@@ -1,8 +1,9 @@
 {% extends 'learning_logs/base.html' %}
+{% block page_header %}
+  <h1>Topics</h1>
+{% endblock page_header %}
 
 {% block content %}
-
-  <p>Topics</p>
 <ul>
     {% for topic in topics %}
       <li>
