@@ -9,12 +9,88 @@
   {% bootstrap_css %}
   {% bootstrap_javascript %}
 
+  <style>
+  body {
+    background-color: #0d1117;
+    color: #e6edf3;
+    min-height: 100vh;
+  }
+
+  .navbar {
+    background-color: #161b22 !important;
+    border-bottom: 1px solid #30363d;
+  }
+
+  .navbar-brand,
+  .nav-link,
+  .navbar-text {
+    color: #e6edf3 !important;
+  }
+
+  .navbar-brand:hover,
+  .nav-link:hover {
+    color: #7cc7ff !important;
+  }
+
+  a {
+    color: #7cc7ff;
+  }
+
+  a:hover {
+    color: #a5ddff;
+  }
+
+  .border,
+  .border-bottom,
+  hr {
+    border-color: #30363d !important;
+  }
+
+  .card,
+  .list-group-item,
+  .bg-light,
+  .bg-white,
+  .bg-body-tertiary,
+  .bg-body-secondary {
+    background-color: #161b22 !important;
+    color: #e6edf3 !important;
+    border-color: #30363d !important;
+  }
+
+  .text-dark,
+  .text-body,
+  .text-body-emphasis,
+  .text-muted {
+    color: #e6edf3 !important;
+  }
+
+  .form-control,
+  input,
+  textarea,
+  select {
+    background-color: #0d1117 !important;
+    color: #e6edf3 !important;
+    border: 1px solid #30363d !important;
+  }
+
+  .form-control:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    background-color: #0d1117 !important;
+    color: #e6edf3 !important;
+    border-color: #7cc7ff !important;
+    box-shadow: none !important;
+  }
+</style>
 </head>
+
 <body>
-  <nav class="navbar navbar-expand-md navbar-light bg-light mb-4 border">
+  <nav class="navbar navbar-expand-md navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="{% url 'learning_logs:index' %}">
-          Learning Log</a>
+        Learning Log
+      </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
         data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
@@ -25,43 +101,39 @@
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'learning_logs:topics' %}">
-              Topics</a></li>
-        </ul> <!-- End of links on left side of navbar -->
+            <a class="nav-link" href="{% url 'learning_logs:topics' %}">Topics</a>
+          </li>
+        </ul>
 
-        <!-- Account-related links -->
         <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-
           {% if user.is_authenticated %}
             <li class="nav-item">
-              <span class="navbar-text me-2">Hello, {{ user.username }}.
-                </span></li>
+              <span class="navbar-text me-2">Hello, {{ user.username }}.</span>
+            </li>
           {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'accounts:register' %}">
-                  Register</a></li>
+              <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
+            </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'accounts:login' %}">
-                  Log in</a></li>
+              <a class="nav-link" href="{% url 'accounts:login' %}">Log in</a>
+            </li>
           {% endif %}
-
-        </ul> <!-- End of account-related links -->
+        </ul>
 
         {% if user.is_authenticated %}
-          <form action="{% url 'accounts:logout' %}" method='post'>
+          <form action="{% url 'accounts:logout' %}" method="post" class="ms-2">
             {% csrf_token %}
-            <button name='submit' class='btn btn-outline-secondary btn-sm'>
-              Log out</button>
+            <button name="submit" class="btn btn-outline-secondary btn-sm">
+              Log out
+            </button>
           </form>
         {% endif %}
-
-      </div> <!-- Closes collapsible parts of navbar -->
-
-    </div> <!-- Closes navbar's container -->
-  </nav> <!-- End of navbar -->
+      </div>
+    </div>
+  </nav>
 
   <main class="container">
-    <div class="pb-2 mb-2 border-bottom">
+    <div class="pb-2 mb-3 border-bottom">
       {% block page_header %}{% endblock page_header %}
     </div>
 
@@ -69,6 +141,5 @@
       {% block content %}{% endblock content %}
     </div>
   </main>
-
 </body>
 </html>
