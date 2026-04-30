@@ -48,6 +48,17 @@ class MoveRules():
         if (abs(move.end_column - move.start_column) == 1 and move.end_row == move.start_row + direction
              and target_piece != "--" and target_piece[0] != move.piece[0]):
             return True
+        if (abs(move.end_column - move.start_column) == 1
+            and move.end_row == move.start_row + direction
+            and target_piece == "--"
+            and self.game.last_move is not None
+            and self.game.last_move.piece[1] == "P"
+            and abs(self.game.last_move.start_row - self.game.last_move.end_row) == 2
+            and self.game.last_move.end_row == move.start_row
+            and self.game.last_move.end_column == move.end_column
+            and self.game.last_move.piece[0] != move.piece[0]):
+            return True
+       
         return False
     
     def _rook_move(self, move):
@@ -248,3 +259,26 @@ class MoveRules():
                     if self.is_valid_move(move):
                         return True
         return False
+    
+    def get_legal_moves_for_piece(self, row, column):
+        """Return all legal moves for a piece"""
+        legal_moves = []
+        piece = self.board[row][column]
+
+        if piece == "--":
+            return legal_moves
+        for end_row in range(8):
+            for end_column in range(8):
+                move = Move(row, column, end_row, end_column, piece)
+
+                if self.is_valid_move(move):
+                    ending_place = self.board[end_row][end_column]
+                    self.board[end_row][end_column] = piece
+                    self.board[row][column] = "--"
+                    if not self.is_in_check(piece[0]):
+                        legal_moves.append(move)
+                    self.board[row][column] = piece
+                    self.board[end_row][end_column] = ending_place
+
+        
+        return legal_moves

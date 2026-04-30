@@ -16,4 +16,4 @@ class Settings():
         self.board_x = (self.screen_width - self.board_pixels) // 2
         self.board_y = (self.screen_height - self.board_pixels) // 2
         self.highlight_color = (255, 255, 0)
-        
+        self.legal_highlight_color = (178, 34, 34)

@@ -33,6 +33,8 @@ class ChessGame():
         self.move_rules = MoveRules(self.board, self)
         self.turn = "w"
         self.font = pygame.font.SysFont(None, 36)
+        self.legal_moves = []
+        self.last_move = None
         pygame.display.set_caption("Chess Masters: Thqt0ne6uy")
     def run_game(self):
         """create a loop to run the game and quit"""
@@ -47,6 +49,7 @@ class ChessGame():
             self.screen.fill(self.settings.bg_color)
             self._draw_board()
             self._highlited_square()
+            self._highlited_legal_moves()
             self._draw_pieces()
             pygame.display.flip()
             self.clock.tick(60)
@@ -98,13 +101,16 @@ class ChessGame():
             if piece != "--" and piece.startswith(self.turn):
                 self.selected_square = (row, column)
                 self.selected_piece = piece
+                self.legal_moves = self.move_rules.get_legal_moves_for_piece(row, column)
         elif self.selected_square == (row, column):
             self.selected_square = None
-            self.selected_piece = None           
+            self.selected_piece = None        
+            self.legal_moves = []   
         else:
             if piece != "--" and piece.startswith(self.turn):
                 self.selected_square = (row, column)
                 self.selected_piece = piece
+                self.legal_moves = self.move_rules.get_legal_moves_for_piece(row, column)
             else:
                 start_row, start_column = self.selected_square
                 move = Move(start_row, start_column, row, column, self.selected_piece)
@@ -143,6 +149,8 @@ class ChessGame():
                     self._update_move_flags(moved_piece, start_row, start_column)
                     self.selected_square = None
                     self.selected_piece = None
+                    self.legal_moves = []
+                    self.last_move = move
 
                     if self.turn == "w":
                         enemy_color = "b"
@@ -182,5 +190,19 @@ class ChessGame():
                          self.settings.square_size)
            pygame.draw.rect(self.screen,self.settings.highlight_color, rect, 4)
     
+    def _highlited_legal_moves(self):
+        for move in self.legal_moves:
+            x = self.settings.board_x + move.end_column * self.settings.square_size
+            y = self.settings.board_y + move.end_row * self.settings.square_size
+            center_x = x + self.settings.square_size // 2
+            center_y = y + self.settings.square_size // 2
+            radius = self.settings.square_size // 3
+            pygame.draw.circle(
+                self.screen,
+                self.settings.legal_highlight_color,
+                (center_x, center_y),
+                radius,
+                3
+            )
 chess = ChessGame()
 chess.run_game()
