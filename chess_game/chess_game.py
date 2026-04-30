@@ -56,6 +56,12 @@ class ChessGame():
             self.settings.screen_height // 2 + 80,
         )
         pygame.display.set_caption("Chess Masters: Thqt0ne6uy")
+    
+    def _ensure_bg_music(self):
+        """Start background music if it is not already playing."""
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load("song/chess.mp3")
+            pygame.mixer.music.play(-1)
 
     def run_game(self):
         """create a loop to run the game and quit"""
@@ -75,6 +81,7 @@ class ChessGame():
             self.screen.fill(self.settings.bg_color)
             if self.game_state == "menu":
                 self._draw_title_screen()
+                self._ensure_bg_music()
             else:
                 self._draw_board()
                 self._highlited_square()
@@ -83,6 +90,8 @@ class ChessGame():
                 self._draw_status_message()
                 if self.game_state == "game_over":
                     self._draw_game_over_screen()
+                    pygame.mixer.music.stop()
+
             pygame.display.flip()
             self.clock.tick(60)
 
@@ -252,7 +261,6 @@ class ChessGame():
                             else:
                                 self.board[row][0] = self.board[row][3]
                                 self.board[row][3] = "--"
-                        print("illegal move: king is in check")
                         return
                     self._update_move_flags(moved_piece, start_row, start_column)
                     self.selected_square = None
