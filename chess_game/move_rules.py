@@ -273,12 +273,34 @@ class MoveRules():
 
                 if self.is_valid_move(move):
                     ending_place = self.board[end_row][end_column]
+                    en_passant = False
+                    en_passant_captured_piece = "--"
+
+                    if (piece[1] == "P"
+                        and abs(end_column - column) == 1
+                        and ending_place == "--"):
+                        en_passant = True
+                        en_passant_captured_piece = self.board[row][end_column]
+                        self.board[row][end_column] = "--"
+
                     self.board[end_row][end_column] = piece
                     self.board[row][column] = "--"
                     if not self.is_in_check(piece[0]):
                         legal_moves.append(move)
                     self.board[row][column] = piece
                     self.board[end_row][end_column] = ending_place
+                    if en_passant:
+                        self.board[row][end_column] = en_passant_captured_piece
 
         
+        return legal_moves
+
+    def get_all_legal_moves(self, color):
+        """Return all legal moves for one side."""
+        legal_moves = []
+        for row in range(8):
+            for column in range(8):
+                piece = self.board[row][column]
+                if piece != "--" and piece.startswith(color):
+                    legal_moves.extend(self.get_legal_moves_for_piece(row, column))
         return legal_moves

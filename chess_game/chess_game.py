@@ -6,6 +6,17 @@ from move import Move
 
 class ChessGame():
     """an overall class to manage chess_game"""
+
+    def _starting_board(self):
+        """Return a fresh starting chess board."""
+        return [["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+                ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+                ["--", "--", "--", "--", "--", "--", "--", "--"],
+                ["--", "--", "--", "--", "--", "--", "--", "--"],
+                ["--", "--", "--", "--", "--", "--", "--", "--"],
+                ["--", "--", "--", "--", "--", "--", "--", "--"],
+                ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
+                ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]]
     
     def __init__(self):
         """initalize values"""
@@ -22,20 +33,30 @@ class ChessGame():
         self.white_right_rook_moved = False
         self.black_right_rook_moved = False
         self.black_left_rook_moved = False
-        self.board = [["bR", "bN", "bB", "bQ", "bK", "bB", "bN","bR"],
-                      ["bP", "bP", "bP", "bP", "bP", "bP", "bP","bP"],
-                      ["--", "--", "--", "--", "--", "--", "--","--"],
-                      ["--", "--", "--", "--", "--", "--", "--","--"],
-                      ["--", "--", "--", "--", "--", "--", "--","--"],
-                      ["--", "--", "--", "--", "--", "--", "--","--"],
-                      ["wP", "wP", "wP", "wP", "wP", "wP", "wP","wP"],
-                      ["wR", "wN", "wB", "wQ", "wK", "wB", "wN","wR"]]
+        self.board = self._starting_board()
         self.move_rules = MoveRules(self.board, self)
         self.turn = "w"
         self.font = pygame.font.SysFont(None, 36)
+        self.title_font = pygame.font.SysFont(None, 88)
+        self.button_font = pygame.font.SysFont(None, 44)
         self.legal_moves = []
         self.last_move = None
+        self.game_state = "menu"
+        self.game_over_message = ""
+        self.status_message = ""
+        self.status_message_end_time = 0
+        self.start_button = pygame.Rect(0, 0, 260, 70)
+        self.start_button.center = (
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 + 70,
+        )
+        self.menu_button = pygame.Rect(0, 0, 290, 70)
+        self.menu_button.center = (
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 + 80,
+        )
         pygame.display.set_caption("Chess Masters: Thqt0ne6uy")
+
     def run_game(self):
         """create a loop to run the game and quit"""
         while True:
@@ -45,14 +66,90 @@ class ChessGame():
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
-                    self._check_board_click(mouse_pos)
+                    if self.game_state == "menu":
+                        self._check_menu_click(mouse_pos)
+                    elif self.game_state == "game_over":
+                        self._check_game_over_click(mouse_pos)
+                    else:
+                        self._check_board_click(mouse_pos)
             self.screen.fill(self.settings.bg_color)
-            self._draw_board()
-            self._highlited_square()
-            self._highlited_legal_moves()
-            self._draw_pieces()
+            if self.game_state == "menu":
+                self._draw_title_screen()
+            else:
+                self._draw_board()
+                self._highlited_square()
+                self._highlited_legal_moves()
+                self._draw_pieces()
+                self._draw_status_message()
+                if self.game_state == "game_over":
+                    self._draw_game_over_screen()
             pygame.display.flip()
             self.clock.tick(60)
+
+    def _check_menu_click(self, mouse_pos):
+        """Start the game from the title screen."""
+        if self.start_button.collidepoint(mouse_pos):
+            self._reset_game()
+            self.game_state = "playing"
+
+    def _check_game_over_click(self, mouse_pos):
+        """Return to the start screen after the game ends."""
+        if self.menu_button.collidepoint(mouse_pos):
+            self._reset_game()
+            self.game_state = "menu"
+
+    def _draw_title_screen(self):
+        """Draw a simple title screen with a start button."""
+        title_image = self.title_font.render("Chess Masters", True, (245, 245, 245))
+        title_rect = title_image.get_rect(center=(
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 - 70,
+        ))
+        self.screen.blit(title_image, title_rect)
+
+        subtitle_image = self.font.render("Click below to start a new game", True, (210, 210, 210))
+        subtitle_rect = subtitle_image.get_rect(center=(
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 - 15,
+        ))
+        self.screen.blit(subtitle_image, subtitle_rect)
+
+        pygame.draw.rect(self.screen, (80, 150, 105), self.start_button, border_radius=10)
+        pygame.draw.rect(self.screen, (235, 235, 235), self.start_button, 3, border_radius=10)
+
+        button_image = self.button_font.render("Start Game", True, (255, 255, 255))
+        button_rect = button_image.get_rect(center=self.start_button.center)
+        self.screen.blit(button_image, button_rect)
+
+    def _draw_game_over_screen(self):
+        """Draw the game-over overlay and back-to-menu button."""
+        overlay = pygame.Surface((self.settings.screen_width, self.settings.screen_height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 150))
+        self.screen.blit(overlay, (0, 0))
+
+        message_image = self.button_font.render(self.game_over_message, True, (255, 255, 255))
+        message_rect = message_image.get_rect(center=(
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 - 10,
+        ))
+        self.screen.blit(message_image, message_rect)
+
+        pygame.draw.rect(self.screen, (80, 110, 170), self.menu_button, border_radius=10)
+        pygame.draw.rect(self.screen, (235, 235, 235), self.menu_button, 3, border_radius=10)
+
+        button_image = self.button_font.render("Back To Start", True, (255, 255, 255))
+        button_rect = button_image.get_rect(center=self.menu_button.center)
+        self.screen.blit(button_image, button_rect)
+    
+    def _draw_status_message(self):
+        """draw a temperary message"""
+        if self.status_message and pygame.time.get_ticks() < self.status_message_end_time:
+            message_image = self.button_font.render(self.status_message, True, (255, 255, 255))
+            message_rect = message_image.get_rect(center=(
+                self.settings.screen_width // 2,
+                40,
+            ))
+            self.screen.blit(message_image, message_rect)
 
     def _draw_board(self):
         """draw a chess bord"""
@@ -129,12 +226,23 @@ class ChessGame():
                             self.board[row][3] = rook_piece
                             self.board[row][0] = "--"
                     captured_piece = self.board[row][column]
+                    en_passant = False
+                    en_passant_captured_piece = "--"
+
+                    if (self.selected_piece[1] == "P"
+                        and abs(column - start_column) == 1
+                        and captured_piece == "--"):
+                        en_passant = True
+                        en_passant_captured_piece = self.board[start_row][column]
+                        self.board[start_row][column] = "--"
                     self.board[row][column] = self.selected_piece
                     self.board[start_row][start_column] = "--"
                     if self.move_rules._promotion(move):
                         self.board[row][column] = self.selected_piece[0] + "Q"
                     if self.move_rules.is_in_check(self.turn):
                         self.board[start_row][start_column] = self.selected_piece
+                        if en_passant:
+                          self.board[start_row][column] = en_passant_captured_piece
                         self.board[row][column] = captured_piece
 
                         if castling:
@@ -158,12 +266,39 @@ class ChessGame():
                         enemy_color = "w" 
                     
                     if self.move_rules.is_in_check(enemy_color):
-                        print("check")
+                        self.status_message = "Check"
+                        self.status_message_end_time = pygame.time.get_ticks() + 2000
+
+                    enemy_moves = self.move_rules.get_all_legal_moves(enemy_color)
+                    if not enemy_moves:
+                        if self.move_rules.is_in_check(enemy_color):
+                            winner = "White" if self.turn == "w" else "Black"
+                            self.game_over_message = f"Checkmate! {winner} wins"
+                        else:
+                            self.game_over_message = "Stalemate"
+                        self.game_state = "game_over"
+
                     if self.turn == "w":
                         self.turn = "b"
                     else:
                         self.turn = "w"
 
+    def _reset_game(self):
+        """Reset the full game state to a fresh game."""
+        self.selected_square = None
+        self.selected_piece = None
+        self.white_king_moved = False
+        self.black_king_moved = False
+        self.white_left_rook_moved = False
+        self.white_right_rook_moved = False
+        self.black_right_rook_moved = False
+        self.black_left_rook_moved = False
+        self.board = self._starting_board()
+        self.move_rules.board = self.board
+        self.turn = "w"
+        self.legal_moves = []
+        self.last_move = None
+        self.game_over_message = ""
 
     def _update_move_flags(self, moved_piece, start_row, start_column):
         """Track whether kings and corner rooks have moved."""
