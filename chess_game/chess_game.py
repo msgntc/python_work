@@ -110,8 +110,10 @@ class ChessGame():
                 move = Move(start_row, start_column, row, column, self.selected_piece)
                 if self.move_rules.is_valid_move(move):
                     moved_piece = self.selected_piece
+                    castling = False
                     if ((self.selected_piece == "wK" or self.selected_piece == "bK")
                         and abs(column - start_column) == 2):
+                        castling = True
                         if column > start_column:
                             rook_piece = self.board[row][7]
                             self.board[row][5] = rook_piece
@@ -120,15 +122,40 @@ class ChessGame():
                             rook_piece = self.board[row][0]
                             self.board[row][3] = rook_piece
                             self.board[row][0] = "--"
+                    captured_piece = self.board[row][column]
                     self.board[row][column] = self.selected_piece
                     self.board[start_row][start_column] = "--"
+                    if self.move_rules._promotion(move):
+                        self.board[row][column] = self.selected_piece[0] + "Q"
+                    if self.move_rules.is_in_check(self.turn):
+                        self.board[start_row][start_column] = self.selected_piece
+                        self.board[row][column] = captured_piece
+
+                        if castling:
+                            if column > start_column:
+                                self.board[row][7] = self.board[row][5]
+                                self.board[row][5] = "--"
+                            else:
+                                self.board[row][0] = self.board[row][3]
+                                self.board[row][3] = "--"
+                        print("illegal move: king is in check")
+                        return
                     self._update_move_flags(moved_piece, start_row, start_column)
                     self.selected_square = None
                     self.selected_piece = None
+
+                    if self.turn == "w":
+                        enemy_color = "b"
+                    else:
+                        enemy_color = "w" 
+                    
+                    if self.move_rules.is_in_check(enemy_color):
+                        print("check")
                     if self.turn == "w":
                         self.turn = "b"
                     else:
                         self.turn = "w"
+
 
     def _update_move_flags(self, moved_piece, start_row, start_column):
         """Track whether kings and corner rooks have moved."""

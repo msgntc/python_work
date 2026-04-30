@@ -1,3 +1,5 @@
+from move import Move
+
 class MoveRules():
     """a class for the rules in chess"""
 
@@ -151,6 +153,8 @@ class MoveRules():
             back_row = 0
             if self.game.black_king_moved == True:
                 return False
+        if self.is_in_check(move.piece[0]):
+            return False
         if move.start_row != back_row or move.end_row != back_row:
             return False
         if move.end_column > move.start_column:
@@ -180,7 +184,67 @@ class MoveRules():
             step = 1
         else:
             step = -1
+    
         for column in range(move.start_column + step, rook_column, step):
             if self.board[back_row][column] != "--":
                 return False
+        original_column = move.start_column
+        for king_column in range(move.start_column, move.end_column + step, step):
+            self.board[move.start_row][original_column] = "--"
+            self.board[move.start_row][king_column] = move.piece
+
+            if self.is_in_check(move.piece[0]):
+                self.board[move.start_row][king_column] = "--"
+                self.board[move.start_row][original_column] = move.piece
+                return False
+            self.board[move.start_row][king_column] = "--"
+            self.board[move.start_row][original_column] = move.piece
         return True 
+    
+    def _promotion(self, move):
+        """promote a pawn"""
+        if move.piece[1] != "P":
+            return False
+        if move.piece.startswith("w"):
+            back_row = 0
+        else:
+            back_row = 7
+        if move.end_row != back_row:
+            return False
+        else:
+            return True
+        
+    def _find_king(self, color):
+        """find the king for a color"""
+        king = color + "K"
+
+        for row in range(8):
+            for column in range(8):
+                if self.board[row][column] == king:
+                    return row, column
+
+        return None
+    
+    def is_in_check(self, color):
+        """check if the king is attacked"""
+        king_square = self._find_king(color)
+        if king_square is None:
+            return False
+        
+        king_row, king_column = king_square
+
+        if color == "w":
+            enemy_color = "b"
+        else:
+            enemy_color = "w"
+        
+        for row in range(8):
+            for column in range(8):
+                piece = self.board[row][column]
+
+                if piece != "--" and piece.startswith(enemy_color):
+                    move = Move(row, column, king_row, king_column, piece)
+
+                    if self.is_valid_move(move):
+                        return True
+        return False
