@@ -24,8 +24,11 @@ class ChessGame():
         self.settings = Settings()
         pygame.init()
         self.clock = pygame.time.Clock()
+        self.fullscreen = False
+        self.music_enabled = True
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.screen_rect = self.screen.get_rect()
+        self._update_layout()
         self.selected_square = None
         self.selected_piece = None
         self.white_king_moved = False
@@ -48,23 +51,64 @@ class ChessGame():
         self.game_over_message = ""
         self.status_message = ""
         self.status_message_end_time = 0
+        self.total_checks = 0
+        self.consecutive_checks = 0
+        self.full_move_count = 0
+        self.endgame_music_playing = False
         self.start_button = pygame.Rect(0, 0, 260, 70)
+        self.fullscreen_button = pygame.Rect(0, 0, 260, 70)
+        self.music_button = pygame.Rect(0, 0, 260, 70)
+        self.menu_button = pygame.Rect(0, 0, 290, 70)
+        self._position_menu_buttons()
+        pygame.display.set_caption("Chess Masters: Thqt0ne6uy")
+
+    def _update_layout(self):
+        """Keep board and menu layout centered for the current screen size."""
+        self.screen_rect = self.screen.get_rect()
+        self.settings.screen_width = self.screen_rect.width
+        self.settings.screen_height = self.screen_rect.height
+        available_board_size = min(
+            self.settings.screen_width - 120,
+            self.settings.screen_height - 140,
+        )
+        available_board_size = max(320, available_board_size)
+        board_pixels = (available_board_size // self.settings.board_size) * self.settings.board_size
+        self.settings.board_pixels = board_pixels
+        self.settings.square_size = self.settings.board_pixels // self.settings.board_size
+        self.settings.board_x = (self.settings.screen_width - self.settings.board_pixels) // 2
+        self.settings.board_y = (self.settings.screen_height - self.settings.board_pixels) // 2
+
+    def _position_menu_buttons(self):
+        """Center the menu buttons for the current screen size."""
         self.start_button.center = (
             self.settings.screen_width // 2,
-            self.settings.screen_height // 2 + 70,
+            self.settings.screen_height // 2 + 35,
         )
-        self.menu_button = pygame.Rect(0, 0, 290, 70)
+        self.fullscreen_button.center = (
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 + 120,
+        )
+        self.music_button.center = (
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 + 205,
+        )
         self.menu_button.center = (
             self.settings.screen_width // 2,
             self.settings.screen_height // 2 + 80,
         )
-        pygame.display.set_caption("Chess Masters: Thqt0ne6uy")
     
     def _ensure_bg_music(self):
         """Start background music if it is not already playing."""
-        if not pygame.mixer.music.get_busy():
+        if self.music_enabled and not pygame.mixer.music.get_busy() and not self.endgame_music_playing:
             pygame.mixer.music.load("song/chess.mp3")
             pygame.mixer.music.play(-1)
+
+    def _trigger_endgame_music(self):
+        """Switch to the endgame track once."""
+        if self.music_enabled and not self.endgame_music_playing:
+            pygame.mixer.music.load("song/end_game.mp3")
+            pygame.mixer.music.play(-1)
+            self.endgame_music_playing = True
 
     def run_game(self):
         """create a loop to run the game and quit"""
@@ -73,6 +117,11 @@ class ChessGame():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_F11:
+                        self._toggle_fullscreen()
+                    elif event.key == pygame.K_ESCAPE and self.fullscreen:
+                        self._toggle_fullscreen()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
                     if self.game_state == "menu":
@@ -100,6 +149,7 @@ class ChessGame():
 
     def _load_piece_images(self):
         """load images from a sprite sheet"""
+        self.piece_images = {}
         sheet_path = os.path.join("images", "pieces.png") 
         sprite_sheet = pygame.image.load(sheet_path).convert_alpha()
 
@@ -130,12 +180,36 @@ class ChessGame():
         if self.start_button.collidepoint(mouse_pos):
             self._reset_game()
             self.game_state = "playing"
+        elif self.fullscreen_button.collidepoint(mouse_pos):
+            self._toggle_fullscreen()
+        elif self.music_button.collidepoint(mouse_pos):
+            self._toggle_music()
 
     def _check_game_over_click(self, mouse_pos):
         """Return to the start screen after the game ends."""
         if self.menu_button.collidepoint(mouse_pos):
             self._reset_game()
             self.game_state = "menu"
+
+    def _toggle_fullscreen(self):
+        """Switch between windowed and fullscreen display."""
+        self.fullscreen = not self.fullscreen
+        if self.fullscreen:
+            self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        else:
+            self.screen = pygame.display.set_mode((1200, 800))
+        self._update_layout()
+        self._position_menu_buttons()
+        self._load_piece_images()
+
+    def _toggle_music(self):
+        """Turn menu and endgame music on or off."""
+        self.music_enabled = not self.music_enabled
+        if not self.music_enabled:
+            pygame.mixer.music.stop()
+            self.endgame_music_playing = False
+        elif self.game_state == "menu":
+            self._ensure_bg_music()
 
     def _draw_title_screen(self):
         """Draw a simple title screen with a start button."""
@@ -153,12 +227,67 @@ class ChessGame():
         ))
         self.screen.blit(subtitle_image, subtitle_rect)
 
+        warning_line_one = self.font.render(
+            "Current version: pawn promotion only becomes a queen.",
+            True,
+            (235, 205, 120),
+        )
+        warning_line_one_rect = warning_line_one.get_rect(center=(
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 + 295,
+        ))
+        self.screen.blit(warning_line_one, warning_line_one_rect)
+
+        warning_line_two = self.font.render(
+            "Stalemate detection is currently limited to positions where the king has no legal move.",
+            True,
+            (235, 205, 120),
+        )
+        warning_line_two_rect = warning_line_two.get_rect(center=(
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 + 330,
+        ))
+        self.screen.blit(warning_line_two, warning_line_two_rect)
+
+        credit_line = self.font.render(
+            "Thanks to BerryArray for the sprite art.",
+            True,
+            (200, 200, 200),
+        )
+        credit_line_rect = credit_line.get_rect(center=(
+            self.settings.screen_width // 2,
+            self.settings.screen_height // 2 + 365,
+        ))
+        self.screen.blit(credit_line, credit_line_rect)
+
         pygame.draw.rect(self.screen, (80, 150, 105), self.start_button, border_radius=10)
         pygame.draw.rect(self.screen, (235, 235, 235), self.start_button, 3, border_radius=10)
 
         button_image = self.button_font.render("Start Game", True, (255, 255, 255))
         button_rect = button_image.get_rect(center=self.start_button.center)
         self.screen.blit(button_image, button_rect)
+
+        pygame.draw.rect(self.screen, (105, 90, 150), self.fullscreen_button, border_radius=10)
+        pygame.draw.rect(self.screen, (235, 235, 235), self.fullscreen_button, 3, border_radius=10)
+
+        if self.fullscreen:
+            fullscreen_label = "Windowed Mode"
+        else:
+            fullscreen_label = "Fullscreen"
+        fullscreen_image = self.button_font.render(fullscreen_label, True, (255, 255, 255))
+        fullscreen_rect = fullscreen_image.get_rect(center=self.fullscreen_button.center)
+        self.screen.blit(fullscreen_image, fullscreen_rect)
+
+        pygame.draw.rect(self.screen, (160, 105, 70), self.music_button, border_radius=10)
+        pygame.draw.rect(self.screen, (235, 235, 235), self.music_button, 3, border_radius=10)
+
+        if self.music_enabled:
+            music_label = "Music: On"
+        else:
+            music_label = "Music: Off"
+        music_image = self.button_font.render(music_label, True, (255, 255, 255))
+        music_rect = music_image.get_rect(center=self.music_button.center)
+        self.screen.blit(music_image, music_rect)
 
     def _draw_game_over_screen(self):
         """Draw the game-over overlay and back-to-menu button."""
@@ -306,6 +435,23 @@ class ChessGame():
                     if self.move_rules.is_in_check(enemy_color):
                         self.status_message = "Check"
                         self.status_message_end_time = pygame.time.get_ticks() + 2000
+                        self.total_checks += 1
+                        self.consecutive_checks += 1
+                    else:
+                        self.consecutive_checks = 0
+
+                    if self.turn == "b":
+                        self.full_move_count += 1
+
+                    if (
+                        not self.endgame_music_playing
+                        and (
+                            self.consecutive_checks >= 2
+                            or self.total_checks >= 3
+                            or self.full_move_count >= 30
+                        )
+                    ):
+                        self._trigger_endgame_music()
 
                     enemy_moves = self.move_rules.get_all_legal_moves(enemy_color)
                     if not enemy_moves:
@@ -337,6 +483,13 @@ class ChessGame():
         self.legal_moves = []
         self.last_move = None
         self.game_over_message = ""
+        self.endgame_music_playing = False
+        self.status_message = ""
+        self.status_message_end_time = 0
+        self.total_checks = 0
+        self.consecutive_checks = 0
+        self.full_move_count = 0
+        self.endgame_music_playing = False
 
     def _update_move_flags(self, moved_piece, start_row, start_column):
         """Track whether kings and corner rooks have moved."""
