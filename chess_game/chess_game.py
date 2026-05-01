@@ -3,6 +3,7 @@ import sys
 from settings import Settings
 from move_rules import MoveRules
 from move import Move
+import os
 
 class ChessGame():
     """an overall class to manage chess_game"""
@@ -39,6 +40,8 @@ class ChessGame():
         self.font = pygame.font.SysFont(None, 36)
         self.title_font = pygame.font.SysFont(None, 88)
         self.button_font = pygame.font.SysFont(None, 44)
+        self.piece_images = {}
+        self._load_piece_images()
         self.legal_moves = []
         self.last_move = None
         self.game_state = "menu"
@@ -94,6 +97,33 @@ class ChessGame():
 
             pygame.display.flip()
             self.clock.tick(60)
+
+    def _load_piece_images(self):
+        """load images from a sprite sheet"""
+        sheet_path = os.path.join("images", "pieces.png") 
+        sprite_sheet = pygame.image.load(sheet_path).convert_alpha()
+
+        piece_order = ["K", "Q", "B", "N", "R", "P",]   
+        cell_width = 16
+        cell_hight = 16   
+        piece_size = self.settings.square_size * 2 // 3
+
+        for column, piece_tipe in enumerate(piece_order):
+            black_rect = pygame.Rect(column * cell_width, 0, cell_width, cell_hight)
+            white_rect = pygame.Rect(column * cell_width, cell_hight, cell_width, cell_hight)
+            black_image = sprite_sheet.subsurface(black_rect)
+            white_image = sprite_sheet.subsurface(white_rect)
+
+            black_image = pygame.transform.scale(
+                black_image, (piece_size, piece_size)
+            )
+
+            white_image = pygame.transform.scale(
+                white_image, (piece_size, piece_size)
+            )
+
+            self.piece_images["b" + piece_tipe] = black_image
+            self.piece_images["w" + piece_tipe] = white_image
 
     def _check_menu_click(self, mouse_pos):
         """Start the game from the title screen."""
@@ -180,13 +210,13 @@ class ChessGame():
             for column in range(self.settings.board_size):
                 piece = self.board[row][column]
                 if piece != "--":
-                    piece_text = self.font.render(piece, True, (0, 0, 0))
                     x = self.settings.board_x + column * self.settings.square_size
                     y = self.settings.board_y + row * self.settings.square_size
-                    piece_rect = piece_text.get_rect(center=(
+                    piece_rect = self.piece_images[piece].get_rect(center=(
                         x + self.settings.square_size // 2,
-                        y + self.settings.square_size // 2))
-                    self.screen.blit(piece_text, piece_rect)
+                        y + self.settings.square_size // 2,
+                    ))
+                    self.screen.blit(self.piece_images[piece], piece_rect)
 
     def _check_board_click(self, mouse_pos):
         """check if the player clicked on the board"""
