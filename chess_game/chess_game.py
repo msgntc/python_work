@@ -51,8 +51,6 @@ class ChessGame():
         self.game_over_message = ""
         self.status_message = ""
         self.status_message_end_time = 0
-        self.total_checks = 0
-        self.consecutive_checks = 0
         self.full_move_count = 0
         self.endgame_music_playing = False
         self.start_button = pygame.Rect(0, 0, 260, 70)
@@ -109,6 +107,26 @@ class ChessGame():
             pygame.mixer.music.load("song/end_game.mp3")
             pygame.mixer.music.play(-1)
             self.endgame_music_playing = True
+
+    def _should_play_endgame_music(self):
+        """Return True when the position looks like an endgame."""
+        total_pieces_without_pawns = 0
+        no_queens = True
+
+        for row in self.board:
+            for piece in row:
+                if piece == "--":
+                    continue
+                if piece[1] != "P":
+                    total_pieces_without_pawns += 1
+                if piece[1] == "Q":
+                    no_queens = False
+
+        return (
+            total_pieces_without_pawns <= 6
+            or (no_queens and total_pieces_without_pawns <= 10)
+            or self.full_move_count > 45
+        )
 
     def run_game(self):
         """create a loop to run the game and quit"""
@@ -435,22 +453,11 @@ class ChessGame():
                     if self.move_rules.is_in_check(enemy_color):
                         self.status_message = "Check"
                         self.status_message_end_time = pygame.time.get_ticks() + 2000
-                        self.total_checks += 1
-                        self.consecutive_checks += 1
-                    else:
-                        self.consecutive_checks = 0
 
                     if self.turn == "b":
                         self.full_move_count += 1
 
-                    if (
-                        not self.endgame_music_playing
-                        and (
-                            self.consecutive_checks >= 2
-                            or self.total_checks >= 3
-                            or self.full_move_count >= 30
-                        )
-                    ):
+                    if not self.endgame_music_playing and self._should_play_endgame_music():
                         self._trigger_endgame_music()
 
                     enemy_moves = self.move_rules.get_all_legal_moves(enemy_color)
@@ -486,8 +493,6 @@ class ChessGame():
         self.endgame_music_playing = False
         self.status_message = ""
         self.status_message_end_time = 0
-        self.total_checks = 0
-        self.consecutive_checks = 0
         self.full_move_count = 0
         self.endgame_music_playing = False
 
